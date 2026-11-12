@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab : construisons un agent ensemble</title>
+<meta name="description" content="Lab pas à pas : un workflow Copilot Studio écrit par GitHub Copilot et créé avec Azure CLI, puis un agent d'accueil dans Copilot Studio. Session aMP Day Lyon 2026.">
+<style>
+:root { --bg:#f6f7f9; --card:#fff; --ink:#1f2430; --muted:#5b6170; --line:#dde1e8; --accent:#E8A200; --accent-soft:#fff6dc; --code:#f1f3f6; --ok:#1f7a4d; --btn:#1f2430; --btn-ink:#fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#14161b; --card:#1d2027; --ink:#eceef3; --muted:#a2a8b6; --line:#30343e; --accent-soft:#3a3220; --code:#262a33; --btn:#E8A200; --btn-ink:#14161b; } }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+a { color:inherit; text-underline-offset:3px; }
+header.hero { background:#1f2430; color:#fff; padding:44px 20px 36px; }
+.wrap { max-width:960px; margin:0 auto; padding:0 16px; }
+.hero .kicker { color:var(--accent); font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:13px; }
+.hero h1 { font-size:clamp(28px,4.5vw,42px); line-height:1.15; margin:8px 0 12px; }
+.hero p { color:#c9cdd6; max-width:720px; margin:0; }
+.hero .meta { margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
+.pill { border:1px solid #3a4152; border-radius:999px; padding:4px 12px; font-size:13px; color:#dfe3ea; }
+nav.toc { position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line); }
+nav.toc .wrap { display:flex; gap:6px; overflow-x:auto; padding-top:8px; padding-bottom:8px; }
+nav.toc a { white-space:nowrap; text-decoration:none; font-size:14px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); }
+nav.toc a.done { border-color:var(--ok); color:var(--ok); }
+main { padding:24px 0 60px; }
+section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:18px 0; scroll-margin-top:64px; }
+h2 { margin:0 0 6px; font-size:24px; display:flex; align-items:center; gap:10px; }
+h2 .num { background:var(--accent); color:#1f2430; border-radius:999px; min-width:34px; height:34px; display:inline-grid; place-items:center; font-size:17px; }
+h3 { font-size:18px; margin:22px 0 6px; }
+.time { color:var(--muted); font-size:14px; margin:0 0 12px; }
+.figure img { width:100%; height:auto; border-radius:10px; border:1px solid var(--line); background:#fff; }
+.figure p { color:var(--muted); font-size:14px; margin:6px 0 0; }
+ol.steps, ul.plain { padding-left:22px; } ol.steps li, ul.plain li { margin:6px 0; }
+table { border-collapse:collapse; width:100%; font-size:15px; margin:8px 0; display:block; overflow-x:auto; }
+th, td { border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
+th { background:var(--code); }
+code { background:var(--code); border-radius:5px; padding:1px 5px; font:14px "Cascadia Mono", Consolas, monospace; }
+.snip { border:1px solid var(--line); border-radius:10px; margin:10px 0; background:var(--code); }
+.snip .bar { display:flex; align-items:center; gap:8px; padding:6px 10px; border-bottom:1px solid var(--line); }
+.snip .bar b { flex:1; font-size:14px; }
+.snip pre { margin:0; padding:10px 12px; white-space:pre-wrap; word-break:break-word; font:13.5px/1.5 "Cascadia Mono", Consolas, monospace; max-height:280px; overflow:auto; }
+button.copy { border:0; border-radius:8px; padding:6px 14px; font:600 14px "Segoe UI", sans-serif; cursor:pointer; background:var(--btn); color:var(--btn-ink); }
+button.copy.ok { background:var(--ok); color:#fff; }
+.note { border-left:4px solid var(--accent); background:var(--accent-soft); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
+.warn { border-left:4px solid #c2410c; background:var(--code); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
+.expect { border-left:4px solid var(--ok); background:var(--code); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
+.done-row { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:12px; border-top:1px dashed var(--line); font-weight:600; }
+.done-row input { width:20px; height:20px; accent-color:var(--ok); }
+.downloads { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:10px 0; }
+.downloads a { display:block; text-decoration:none; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--code); }
+.downloads a b { display:block; } .downloads a span { color:var(--muted); font-size:13px; }
+footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16px 40px; }
+@media (max-width:600px) { section { padding:18px 16px; } }
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+  <div class="kicker">Lab · aMP Day Lyon 2026</div>
+  <h1>Construisons un agent ensemble</h1>
+  <p>Refaites chez vous la démonstration de la session : un workflow Copilot Studio d'accueil des nouveaux collaborateurs, écrit par GitHub Copilot et créé avec Azure CLI, puis un agent d'accueil dans Copilot Studio qui répond à partir de vos documents.</p>
+  <div class="meta"><span class="pill">Durée : 60 à 90 minutes</span><span class="pill">Niveau : introduction</span><span class="pill">Entreprise fictive : Contoso</span></div>
+</div></header>
+
+<nav class="toc"><div class="wrap" id="toc"></div></nav>
+
+<main class="wrap">
+
+<section id="apercu">
+  <h2>Ce que vous allez construire</h2>
+  <p class="time">Camille arrive lundi chez Contoso. Deux choses vont l'accueillir.</p>
+  <div class="figure"><img src="images/ce-quon-va-construire.png" alt="Le workflow : bienvenue, manager prévenu, café d'accueil, vérification du matériel trois jours après. L'agent : Camille pose une question, l'assistant cherche dans les documents et répond avec sa source."></div>
+  <h3>Et comment</h3>
+  <div class="figure"><img src="images/comment-on-va-le-construire.png" alt="Le workflow : un fichier de contexte, GitHub Copilot écrit le workflow, Azure CLI l'enregistre dans Dataverse, il est actif dans Copilot Studio. L'agent : instructions, connaissances, test et évaluation, publication."></div>
+</section>
+
+<section id="prerequis">
+  <h2>Avant de commencer</h2>
+  <div class="warn"><b>Un tenant de test, jamais de production.</b> Le lab envoie des e-mails, des messages Teams et des invitations réels, et crée un site, une liste, un workflow et un agent.</div>
+  <ul class="plain">
+    <li>Un tenant Microsoft 365 de test avec SharePoint, Outlook et Teams, et un compte qui peut créer un site.</li>
+    <li>Un environnement Power Platform avec Dataverse et des crédits Copilot alloués : c'est ce qui fait apparaître la nouvelle expérience de Copilot Studio (agents et workflows propulsés par le « harnais GitHub Copilot »).</li>
+    <li>Azure CLI installé (la commande <code>az</code>) : <a href="https://learn.microsoft.com/cli/azure/install-azure-cli" target="_blank" rel="noopener">installer Azure CLI</a>.</li>
+    <li>GitHub Copilot : l'application de bureau ou la ligne de commande, avec un abonnement actif.</li>
+    <li>Les fichiers du lab, ci-dessous.</li>
+  </ul>
+  <div class="downloads">
+    <a href="fichiers/documents-contoso.zip" download><b>Documents Contoso (zip)</b><span>5 documents des ressources humaines + l'archive 2021 du piège</span></a>
+    <a href="fichiers/copilot-instructions.md" download><b>copilot-instructions.md</b><span>Le contexte pour GitHub Copilot (5 valeurs à remplacer)</span></a>
+    <a href="fichiers/test-set-accueil.csv" download><b>test-set-accueil.csv</b><span>Les 10 questions d'évaluation de l'agent</span></a>
+  </div>
+  <div class="done-row"><input type="checkbox" data-step="prerequis" id="c-prerequis"><label for="c-prerequis">Prêt</label></div>
+</section>
+
+<section id="etape1">
+  <h2><span class="num">1</span>Préparer SharePoint</h2>
+  <p class="time">Environ 15 minutes</p>
+  <ol class="steps">
+    <li>Créez un site d'équipe nommé <b>Contoso - Ressources humaines</b> (adresse conseillée : <code>/sites/contoso-rh</code>).</li>
+    <li>Dans sa bibliothèque <b>Documents</b>, déposez les 5 documents du zip, et créez un dossier <b>Archives</b> où vous déposez <code>politique-teletravail-2021.pdf</code>. Cette vieille politique est le piège de l'étape 4 : gardez-la.</li>
+    <li>Créez une liste vide nommée <b>Arrivées</b>, puis ses colonnes.</li>
+  </ol>
+  <div class="note"><b>Important : créez chaque colonne d'abord avec son nom court</b> (colonne du milieu), puis renommez-la avec son nom affiché. SharePoint garde le nom court comme nom interne, et c'est lui que le workflow utilise. Une colonne créée directement en « Date d'arrivée » aurait un nom interne illisible et le workflow échouerait.</div>
+  <table>
+    <tr><th>Nom affiché</th><th>Nom à la création</th><th>Type</th></tr>
+    <tr><td>Nom complet</td><td>(la colonne Titre existante, renommée)</td><td>Ligne de texte</td></tr>
+    <tr><td>E-mail</td><td><code>Email</code></td><td>Ligne de texte</td></tr>
+    <tr><td>Poste</td><td><code>Poste</code></td><td>Ligne de texte</td></tr>
+    <tr><td>Date d'arrivée</td><td><code>DateArrivee</code></td><td>Date, sans heure</td></tr>
+    <tr><td>Manager</td><td><code>Manager</code></td><td>Personne</td></tr>
+    <tr><td>Parrain ou marraine</td><td><code>Parrain</code></td><td>Personne</td></tr>
+    <tr><td>Matériel remis</td><td><code>MaterielRemis</code></td><td>Choix : Non, Oui (Non par défaut)</td></tr>
+  </table>
+  <p>Ajoutez deux arrivées passées pour que la liste ne soit pas vide (par exemple Hugo Bernard et Inès Moreau, avec vous comme manager et parrain).</p>
+  <div class="done-row"><input type="checkbox" data-step="etape1" id="c-etape1"><label for="c-etape1">Site, documents et liste prêts</label></div>
+</section>
+
+<section id="etape2">
+  <h2><span class="num">2</span>Préparer l'environnement et relever 5 valeurs</h2>
+  <p class="time">Environ 10 minutes</p>
+  <ol class="steps">
+    <li>Dans Power Automate, environnement de test, menu <b>Connexions</b> : créez une connexion <b>SharePoint</b>, une <b>Office 365 Outlook</b> et une <b>Microsoft Teams</b>, avec votre compte. Les créer maintenant évite toute fenêtre de consentement pendant l'étape 3. GitHub Copilot créera lui-même les trois <b>références de connexion</b> Dataverse qui pointent vers elles : c'est par elles qu'un workflow Copilot Studio utilise une connexion.</li>
+    <li>Relevez les 5 valeurs, puis remplacez-les dans <code>copilot-instructions.md</code> (rechercher et remplacer) :</li>
+  </ol>
+  <table>
+    <tr><th>Dans le fichier</th><th>Où la trouver</th></tr>
+    <tr><td><code>TENANT_ID</code></td><td>Identifiant (ID) du tenant : <code>az login</code> puis <code>az account show --query tenantId -o tsv</code></td></tr>
+    <tr><td><code>ENVIRONNEMENT_ID</code></td><td>Dans l'adresse de Power Automate ou de Copilot Studio, après <code>/environments/</code></td></tr>
+    <tr><td><code>URL_DATAVERSE</code></td><td>Centre d'administration Power Platform, Environnements, votre environnement : « URL de l'environnement », par exemple <code>https://votre-env.crm.dynamics.com</code> (sans barre oblique finale)</td></tr>
+    <tr><td><code>URL_DU_SITE</code></td><td>L'adresse du site, par exemple <code>https://votre-tenant.sharepoint.com/sites/contoso-rh</code></td></tr>
+    <tr><td><code>LISTE_ID</code></td><td>Liste Arrivées, Paramètres de la liste : l'adresse contient <code>List=%7B…%7D</code>, l'ID est entre les accolades (sans <code>%7B</code> ni <code>%7D</code>)</td></tr>
+  </table>
+  <div class="done-row"><input type="checkbox" data-step="etape2" id="c-etape2"><label for="c-etape2">Connexions créées, fichier complété</label></div>
+</section>
+
+<section id="etape3">
+  <h2><span class="num">3</span>Le workflow, écrit par GitHub Copilot</h2>
+  <p class="time">Environ 15 minutes, dont 2 minutes où Copilot travaille seul</p>
+  <ol class="steps">
+    <li>Créez un dossier <b>hors de tout dépôt git</b> (par exemple <code>C:\lab-accueil</code>) et mettez-y <code>.github\copilot-instructions.md</code>. Dans un dépôt git, l'application GitHub Copilot travaille sur une copie du dépôt où ce fichier non suivi n'existe pas.</li>
+    <li>Ouvrez un terminal et connectez-vous : <code>az login --tenant VOTRE_TENANT_ID</code>.</li>
+    <li>Dans GitHub Copilot, ouvrez une <b>nouvelle session</b> sur ce dossier (application : « Add local folder or repository » ; ligne de commande : <code>copilot</code> dans le dossier).</li>
+    <li>Collez ce prompt et envoyez :</li>
+  </ol>
+  <div data-snip="Prompt du workflow" data-label="Le prompt"></div>
+  <div class="expect"><b>Ce qui doit se passer :</b> Copilot lit le fichier de contexte, vous montre les étapes, crée les références de connexion, écrit un script dans <code>flux/</code> qui construit le workflow (la définition et le dessin de l'éditeur), l'enregistre dans Dataverse et l'active. Il vous donne le lien : le workflow s'ouvre dans le <b>nouvel éditeur</b> de Copilot Studio, page <b>Workflows</b>. Quelques minutes, sans question.</div>
+  <div class="note"><b>Pourquoi Dataverse ?</b> Un workflow Copilot Studio est une ligne de la table Dataverse <code>workflows</code>. Elle contient deux vues du même workflow : la définition exécutée et le graphe que dessine l'éditeur. Sans le graphe, le workflow tourne mais l'éditeur ne sait pas l'afficher ; le fichier de contexte donne à Copilot les règles exactes.</div>
+  <h3>Tester</h3>
+  <ol class="steps">
+    <li>Ajoutez une ligne dans la liste : Camille Martin, un e-mail d'un compte de test, une <b>date d'arrivée passée</b> (l'attente de 3 jours est alors déjà écoulée), Matériel remis : Non.</li>
+    <li>Le déclencheur passe toutes les minutes. Dites à Copilot que la ligne est ajoutée : il suit l'exécution et résume chaque action.</li>
+  </ol>
+  <div class="expect"><b>Résultat :</b> l'e-mail de bienvenue, le message Teams au manager (envoyé par le Flow bot), l'invitation « Café de bienvenue », puis la relance « matériel ». Dans Copilot Studio, l'onglet <b>Activity</b> du workflow montre chaque étape en vert.</div>
+  <div class="warn"><b>Si Copilot hésite ou cherche sur le web</b> : rappelez-lui que tout est dans <code>copilot-instructions.md</code>. <b>Si une session a lu une ancienne version du fichier</b>, ouvrez-en une nouvelle : elle s'en tient à ce qu'elle a lu.</div>
+  <p>Le saviez-vous ? Une exécution de workflow dure au plus 30 jours. Pour un vrai accueil, séparez-le en deux : l'accueil immédiat, et une relance quotidienne.</p>
+  <div class="done-row"><input type="checkbox" data-step="etape3" id="c-etape3"><label for="c-etape3">Workflow créé et testé</label></div>
+</section>
+
+<section id="etape4">
+  <h2><span class="num">4</span>L'agent d'accueil dans Copilot Studio</h2>
+  <p class="time">Environ 20 minutes</p>
+  <ol class="steps">
+    <li>Copilot Studio, environnement de test, <b>Accueil</b>, carte <b>Agent</b>. Nommez-le <b>Assistant d'accueil Contoso</b>.</li>
+    <li>Collez les instructions :</li>
+  </ol>
+  <div data-snip="Instructions" data-label="Instructions de l'agent"></div>
+  <ol class="steps" start="3">
+    <li>Panneau de droite : retirez <b>Work IQ</b> (confirmez « Remove ») et <b>Search all websites</b>. L'agent ne répondra qu'à partir de vos documents.</li>
+    <li><b>Knowledge</b>, <b>+</b>, <b>SharePoint</b> : collez l'adresse du site, <b>Add</b>, puis <b>Add to agent</b>. La source est prête en quelques secondes. Enregistrez (Ctrl+S).</li>
+    <li>Onglet <b>Preview</b>, posez la question :</li>
+  </ol>
+  <div data-snip="Question 1 (télétravail)" data-label="Question 1"></div>
+  <div class="note"><b>Le piège :</b> la réponse est juste (deux jours), mais regardez les sources : l'archive de 2021 est citée. Un document mort reste une source. Corrigez : retournez dans <b>Build</b>, cliquez juste après la dernière phrase des instructions, ajoutez la ligne ci-dessous, enregistrez, puis <b>New chat</b> et reposez la question. Seule la politique 2026 est citée. En production, la vraie correction est de sortir l'archive du site.</div>
+  <div data-snip="Ligne de correction" data-label="Ligne de correction"></div>
+  <div data-snip="Question hors périmètre" data-label="Question hors périmètre (l'agent doit refuser poliment)"></div>
+  <h3>Évaluer</h3>
+  <ol class="steps">
+    <li>Onglet <b>Evaluate</b> : nom « Accueil Contoso », <b>Import</b>, choisissez le type <b>Conversations</b> avant de déposer <code>test-set-accueil.csv</code>, puis lancez.</li>
+  </ol>
+  <div class="expect"><b>Résultat attendu :</b> 9 sur 10 en environ 3 minutes. L'échec est la question du salaire : la méthode « General quality » compte un refus poli comme une non-réponse. Un score se lit, il ne se croit pas sur parole.</div>
+  <h3>Publier</h3>
+  <ol class="steps">
+    <li><b>Build</b>, <b>Channels</b>, <b>+</b>, <b>Teams + Microsoft 365</b>, « Microsoft Copilot and Microsoft Teams » (ce choix ne se change plus après publication), <b>Add channel</b>, puis <b>Publish</b>.</li>
+    <li>Environ 2 minutes 30 plus tard, ouvrez l'agent dans Teams (« View in Teams + Microsoft 365 » ; si la page de lancement reste bloquée, ouvrez Teams sur le web) et posez :</li>
+  </ol>
+  <div data-snip="Question dans Teams" data-label="Question dans Teams"></div>
+  <div class="done-row"><input type="checkbox" data-step="etape4" id="c-etape4"><label for="c-etape4">Agent testé, évalué et publié</label></div>
+</section>
+
+<section id="etape5">
+  <h2><span class="num">5</span>Nettoyer</h2>
+  <p class="time">5 minutes. Le harnais GitHub Copilot consomme des crédits Copilot à chaque test et évaluation.</p>
+  <ul class="plain">
+    <li>Copilot Studio, <b>Workflows</b> : désactivez puis supprimez le workflow « Accueil des nouveaux collaborateurs ».</li>
+    <li>Copilot Studio : retirez l'agent de Teams, puis supprimez-le.</li>
+    <li>SharePoint : supprimez les lignes de test, ou le site entier si vous ne le gardez pas.</li>
+  </ul>
+  <div class="done-row"><input type="checkbox" data-step="etape5" id="c-etape5"><label for="c-etape5">Nettoyé</label></div>
+</section>
+
+<section id="retenir">
+  <h2>Avant de publier un agent : 5 vérifications</h2>
+  <ol class="steps">
+    <li>Des sources propres : une seule version de chaque politique, les archives exclues.</li>
+    <li>Des connexions créées à l'avance, avec le bon compte.</li>
+    <li>Un jeu d'évaluation d'au moins 10 questions, dont des questions hors périmètre.</li>
+    <li>Une validation humaine là où une erreur coûte cher.</li>
+    <li>Une consommation de crédits mesurée avant d'ouvrir à tout le monde.</li>
+  </ol>
+  <h3>Pour aller plus loin</h3>
+  <ul class="plain">
+    <li><a href="https://learn.microsoft.com/microsoft-copilot-studio/" target="_blank" rel="noopener">Documentation Copilot Studio</a></li>
+    <li><a href="https://learn.microsoft.com/power-apps/developer/data-platform/webapi/overview" target="_blank" rel="noopener">API web de Dataverse</a></li>
+    <li><a href="https://docs.github.com/copilot" target="_blank" rel="noopener">Documentation GitHub Copilot</a></li>
+  </ul>
+</section>
+
+</main>
+<footer>Lab de la session « Construisons un agent ensemble : Copilot Studio en direct, de zéro à un agent qui fonctionne », aMP Day Lyon 2026.<br>Par Elliot Margot, Microsoft MVP (Most Valuable Professional) Microsoft 365 Copilot et Copilot Studio. Contoso est une entreprise fictive.</footer>
+
+<script>
+const TEXTS = {"Prompt du workflow": "Crée le workflow Copilot Studio « Accueil des nouveaux collaborateurs » dans mon environnement de test.\nQuand une ligne est ajoutée dans la liste « Arrivées » :\n1. envoie au nouveau collaborateur (colonne E-mail) un e-mail de bienvenue chaleureux avec son programme de la première semaine ;\n2. préviens son manager dans Teams, avec le poste et la date d'arrivée ;\n3. envoie une invitation Outlook de 30 minutes « Café de bienvenue » au nouveau collaborateur et à son parrain ou sa marraine, le jour de l'arrivée à 11 h, heure de Paris ;\n4. 3 jours après la date d'arrivée, si « Matériel remis » vaut toujours Non, relance le manager par e-mail.\nMontre-moi d'abord les étapes, puis crée le workflow, active-le et donne-moi le lien pour l'ouvrir dans Copilot Studio.", "Instructions": "Tu es l'assistant d'accueil des nouveaux collaborateurs de Contoso, agence de Lyon.\n\nTu réponds en français, de façon chaleureuse et concise, aux questions sur le livret d'accueil, la première semaine, le télétravail, les congés, l'informatique et les avantages.\n\nTu réponds uniquement à partir des documents du site « Contoso - Ressources humaines » et tu cites toujours le document utilisé. Si la réponse n'y figure pas, dis-le simplement et oriente vers les ressources humaines (rh-lyon@contoso.example, poste 2100).\n\nTu ne communiques jamais d'informations personnelles ou de rémunération sur d'autres personnes.\n\nTu n'effectues aucune action à la place du collaborateur (poser des congés, commander du matériel) : tu expliques comment faire.", "Question 1 (télétravail)": "Combien de jours de télétravail ai-je droit ?", "Ligne de correction": " Ignore les documents du dossier Archives : seules les versions en vigueur comptent.", "Question 2 (période d'essai)": "Puis-je télétravailler pendant ma période d'essai ?", "Question hors périmètre": "Quel est le salaire de mon manager ?", "Question dans Teams": "Où est-ce que je récupère mon ordinateur ?"};
+document.querySelectorAll('[data-snip]').forEach(el => {
+  const text = TEXTS[el.dataset.snip] || '';
+  el.className = 'snip';
+  el.innerHTML = '<div class="bar"><b></b><button class="copy">Copier</button></div><pre></pre>';
+  el.querySelector('b').textContent = el.dataset.label;
+  el.querySelector('pre').textContent = text.trim();
+  el.querySelector('button').addEventListener('click', async (e) => {
+    const b = e.currentTarget;
+    try { await navigator.clipboard.writeText(text.trim()); }
+    catch { const t = document.createElement('textarea'); t.value = text.trim(); document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    b.classList.add('ok'); b.textContent = 'Copié'; setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copier'; }, 1400);
+  });
+});
+// Table of contents with progress remembered in this browser only.
+const toc = document.getElementById('toc');
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+document.querySelectorAll('main > section').forEach(sec => {
+  const a = document.createElement('a');
+  a.href = '#' + sec.id;
+  a.textContent = sec.querySelector('h2').textContent.replace(/^\d/, m => m + '. ');
+  a.id = 'toc-' + sec.id; toc.appendChild(a);
+});
+document.querySelectorAll('input[data-step]').forEach(cb => {
+  const key = 'lab-accueil-' + cb.dataset.step;
+  cb.checked = store.get(key) === '1';
+  const mark = () => { const a = document.getElementById('toc-' + cb.dataset.step); if (a) a.classList.toggle('done', cb.checked); };
+  mark();
+  cb.addEventListener('change', () => { store.set(key, cb.checked ? '1' : '0'); mark(); });
+});
+</script>
+</body>
+</html>
