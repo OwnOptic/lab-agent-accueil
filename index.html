@@ -85,6 +85,13 @@ code { background: var(--code-bg); border-radius: 6px; padding: 1px 6px; font-si
 @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 .hero .wave { position: absolute; bottom: -1px; left: 0; width: 100%; height: 70px; }
 
+
+/* Tool switch */
+.tools { display: inline-flex; align-items: center; gap: 4px; margin-top: 14px; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); font-size: 14.5px; }
+.tools span { padding: 0 8px 0 10px; color: #c3ccd7; }
+.tools a { color: #fff; text-decoration: none; padding: 7px 14px; border-radius: 999px; font-weight: 600; transition: background .2s; }
+.tools a:hover { background: rgba(255,255,255,.14); }
+.tools a.on { background: #fff; color: var(--navy-deep); box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 /* ---------- Sticky progress bar ---------- */
 .bar { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .bar .scroll { position: absolute; left: 0; top: 0; height: 3px; width: 0; background: linear-gradient(90deg, var(--orange), var(--amber)); }
@@ -291,6 +298,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
     <div class="hero-grid">
       <div>
         <span class="kicker"><span class="dot"></span>Lab · aMP Day Lyon 2026</span>
+        <br><nav class="tools" aria-label="Choisir l'outil"><span>Créer avec</span><a href="./" class="on" aria-current="page">🤖 GitHub Copilot</a><a href="claude.html">✦ Claude</a></nav>
         <h1>Construisons un <span class="grad">agent</span> ensemble</h1>
         <div class="typer" aria-live="polite">Refaites chez vous la démo de la session : <b id="typer">un workflow écrit par GitHub Copilot</b></div>
         <div class="cta">
@@ -444,6 +452,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
     <li>Collez ce prompt et envoyez :</li>
   </ol>
   <div data-snip="Prompt du workflow" data-label="Le prompt, à coller dans GitHub Copilot"></div>
+  <div class="callout note" id="autre-outil"><b>Vous préférez Claude ?</b> Le même lab existe avec Claude Code : <a href="claude.html#etape3">ouvrir la version Claude</a>. Mêmes fichiers, même prompt, seuls le nom du fichier de contexte et le lancement changent.</div>
   <div class="callout expect"><b>Ce qui doit se passer :</b> Copilot lit le fichier de contexte, vous montre les étapes, crée les références de connexion, écrit un script dans <code>flux/</code> qui construit le workflow (la définition et le dessin de l'éditeur), l'enregistre dans Dataverse et l'active. Il vous donne le lien : le workflow s'ouvre dans le <b>nouvel éditeur</b> de Copilot Studio, page <b>Workflows</b>. Quelques minutes, sans question.</div>
   <div class="callout note"><b>Pourquoi Dataverse ?</b> Un workflow Copilot Studio est une ligne de la table Dataverse <code>workflows</code>. Elle contient deux vues du même workflow : la définition exécutée et le graphe que dessine l'éditeur. Sans le graphe, le workflow tourne mais l'éditeur ne sait pas l'afficher ; le fichier de contexte donne à Copilot les règles exactes.</div>
   <h3>Tester</h3>
