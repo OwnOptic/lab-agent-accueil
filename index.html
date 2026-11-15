@@ -232,6 +232,26 @@ th { color: var(--muted); font-weight: 600; font-size: 13.5px; text-transform: u
 
 footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px 16px 50px; position: relative; z-index: 1; }
 
+
+/* ---------- Animated page background ---------- */
+.bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bg .glow { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .32; animation: drift 24s ease-in-out infinite alternate; will-change: transform; }
+.bg .g1 { width: 560px; height: 560px; background: var(--orange); top: 8%; left: -220px; }
+.bg .g2 { width: 520px; height: 520px; background: #4f7fb3; top: 45%; right: -200px; animation-duration: 30s; }
+.bg .g3 { width: 420px; height: 420px; background: var(--amber); bottom: -160px; left: 30%; animation-duration: 34s; opacity: .22; }
+.bg .shape { position: absolute; will-change: transform; }
+.bg .shape svg { display: block; animation: bob 9s ease-in-out infinite; }
+.bg .shape.spin svg { animation: turn 40s linear infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-22px) rotate(8deg); } }
+@keyframes turn { to { transform: rotate(360deg); } }
+.bg .s1 { top: 14%; left: 3%; } .bg .s2 { top: 30%; right: 4%; } .bg .s3 { top: 58%; left: 2%; }
+.bg .s4 { top: 76%; right: 6%; } .bg .s5 { top: 88%; left: 8%; } .bg .s6 { top: 6%; right: 18%; }
+.bg .s7 { top: 48%; left: 9%; } .bg .s8 { top: 66%; right: 14%; }
+.bg .s2 svg { animation-delay: -3s; } .bg .s4 svg { animation-delay: -5s; } .bg .s5 svg { animation-delay: -2s; } .bg .s7 svg { animation-delay: -6s; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .bg .glow { opacity: .2; } }
+:root[data-theme="dark"] .bg .glow { opacity: .2; }
+.card:not(.author):not(.quiz) { background: color-mix(in srgb, var(--card) 90%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+@media (max-width: 860px) { .bg .shape { opacity: .6; } .bg .s6, .bg .s7, .bg .s8 { display: none; } }
 /* Lightbox, toast, confetti */
 .lightbox { position: fixed; inset: 0; background: rgba(10,14,20,.85); z-index: 60; display: none; place-items: center; padding: 20px; cursor: zoom-out; }
 .lightbox.open { display: grid; animation: fade .25s; }
@@ -295,6 +315,17 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,80 480,0 720,30 C960,60 1200,10 1440,40 L1440,70 L0,70 Z" fill="var(--bg)"/></svg>
 </header>
 
+<div class="bg" aria-hidden="true">
+  <div class="glow g1"></div><div class="glow g2"></div><div class="glow g3"></div>
+  <div class="shape s1" data-speed="0.12"><svg width="90" height="90" viewBox="0 0 90 90"><circle cx="45" cy="45" r="36" fill="none" stroke="#F26F21" stroke-width="5" opacity=".55"/></svg></div>
+  <div class="shape s2 spin" data-speed="0.22"><svg width="120" height="120" viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#4f7fb3" stroke-width="4" stroke-dasharray="4 12" stroke-linecap="round" opacity=".6"/></svg></div>
+  <div class="shape s3" data-speed="0.3"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M28 6v44M6 28h44" stroke="#FFB547" stroke-width="7" stroke-linecap="round" opacity=".7"/></svg></div>
+  <div class="shape s4" data-speed="0.16"><svg width="110" height="60" viewBox="0 0 110 60"><path d="M5 40 C 20 5, 35 5, 50 30 S 80 55, 105 15" fill="none" stroke="#F26F21" stroke-width="5" stroke-linecap="round" opacity=".5"/></svg></div>
+  <div class="shape s5" data-speed="0.26"><svg width="70" height="70" viewBox="0 0 70 70"><path d="M35 6 L64 58 H6 Z" fill="none" stroke="#4f7fb3" stroke-width="5" stroke-linejoin="round" opacity=".55"/></svg></div>
+  <div class="shape s6" data-speed="0.18"><svg width="44" height="44" viewBox="0 0 44 44"><path d="M22 2 L26 18 L42 22 L26 26 L22 42 L18 26 L2 22 L18 18 Z" fill="#FFB547" opacity=".75"/></svg></div>
+  <div class="shape s7 spin" data-speed="0.1"><svg width="64" height="64" viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="12" fill="none" stroke="#FFB547" stroke-width="5" opacity=".55"/></svg></div>
+  <div class="shape s8" data-speed="0.34"><svg width="80" height="24" viewBox="0 0 80 24"><g fill="#F26F21" opacity=".6"><circle cx="8" cy="12" r="6"/><circle cx="40" cy="12" r="6"/><circle cx="72" cy="12" r="6"/></g></svg></div>
+</div>
 <nav class="bar" aria-label="Étapes du lab">
   <div class="scroll" id="scrollbar"></div>
   <div class="wrap">
@@ -657,6 +688,14 @@ document.getElementById('gen').addEventListener('click', async () => {
   } catch { toast('Téléchargement impossible : utilisez le fichier modèle et remplacez à la main'); }
 });
 
+
+// Parallax on the background shapes
+const shapesEls = [...document.querySelectorAll('.bg .shape')];
+if (!reduce && shapesEls.length) {
+  let ticking = false;
+  addEventListener('scroll', () => { if (ticking) return; ticking = true; requestAnimationFrame(() => {
+    const y = scrollY; shapesEls.forEach((el, i) => { const k = +el.dataset.speed; el.style.transform = 'translate(' + (Math.cos(y * k / 260 + i) * 24).toFixed(1) + 'px,' + (Math.sin(y * k / 160 + i) * 70).toFixed(1) + 'px)'; }); ticking = false; }); }, { passive: true });
+}
 // Confetti
 const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
 let parts = [], raf;
