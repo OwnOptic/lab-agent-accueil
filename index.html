@@ -4,102 +4,357 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lab : construisons un agent ensemble</title>
-<meta name="description" content="Lab pas à pas : un workflow Copilot Studio écrit par GitHub Copilot et créé avec Azure CLI, puis un agent d'accueil dans Copilot Studio. Session aMP Day Lyon 2026.">
+<meta name="description" content="Lab pas à pas : un workflow Copilot Studio écrit par GitHub Copilot et créé avec Azure CLI, puis un agent d'accueil dans Copilot Studio. Par Elliot Margot, Microsoft MVP. Session aMP Day Lyon 2026.">
+<meta property="og:title" content="Lab : construisons un agent ensemble">
+<meta property="og:description" content="Un workflow Copilot Studio écrit par GitHub Copilot, puis un agent d'accueil qui cite ses sources. Pas à pas, dans votre tenant de test.">
+<meta property="og:image" content="https://ownoptic.github.io/lab-agent-accueil/images/ce-quon-va-construire.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232A3B4E'/%3E%3Cpath d='M18 40l9-18 9 12 5-7 6 13' fill='none' stroke='%23F26F21' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root { --bg:#f6f7f9; --card:#fff; --ink:#1f2430; --muted:#5b6170; --line:#dde1e8; --accent:#E8A200; --accent-soft:#fff6dc; --code:#f1f3f6; --ok:#1f7a4d; --btn:#1f2430; --btn-ink:#fff; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#14161b; --card:#1d2027; --ink:#eceef3; --muted:#a2a8b6; --line:#30343e; --accent-soft:#3a3220; --code:#262a33; --btn:#E8A200; --btn-ink:#14161b; } }
-* { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
-a { color:inherit; text-underline-offset:3px; }
-header.hero { background:#1f2430; color:#fff; padding:44px 20px 36px; }
-.wrap { max-width:960px; margin:0 auto; padding:0 16px; }
-.hero .kicker { color:var(--accent); font-weight:700; letter-spacing:.06em; text-transform:uppercase; font-size:13px; }
-.hero h1 { font-size:clamp(28px,4.5vw,42px); line-height:1.15; margin:8px 0 12px; }
-.hero p { color:#c9cdd6; max-width:720px; margin:0; }
-.hero .meta { margin-top:18px; display:flex; gap:10px; flex-wrap:wrap; }
-.pill { border:1px solid #3a4152; border-radius:999px; padding:4px 12px; font-size:13px; color:#dfe3ea; }
-nav.toc { position:sticky; top:0; z-index:5; background:var(--card); border-bottom:1px solid var(--line); }
-nav.toc .wrap { display:flex; gap:6px; overflow-x:auto; padding-top:8px; padding-bottom:8px; }
-nav.toc a { white-space:nowrap; text-decoration:none; font-size:14px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); }
-nav.toc a.done { border-color:var(--ok); color:var(--ok); }
-main { padding:24px 0 60px; }
-section { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 24px; margin:18px 0; scroll-margin-top:64px; }
-h2 { margin:0 0 6px; font-size:24px; display:flex; align-items:center; gap:10px; }
-h2 .num { background:var(--accent); color:#1f2430; border-radius:999px; min-width:34px; height:34px; display:inline-grid; place-items:center; font-size:17px; }
-h3 { font-size:18px; margin:22px 0 6px; }
-.time { color:var(--muted); font-size:14px; margin:0 0 12px; }
-.figure img { width:100%; height:auto; border-radius:10px; border:1px solid var(--line); background:#fff; }
-.figure p { color:var(--muted); font-size:14px; margin:6px 0 0; }
-ol.steps, ul.plain { padding-left:22px; } ol.steps li, ul.plain li { margin:6px 0; }
-table { border-collapse:collapse; width:100%; font-size:15px; margin:8px 0; display:block; overflow-x:auto; }
-th, td { border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top; }
-th { background:var(--code); }
-code { background:var(--code); border-radius:5px; padding:1px 5px; font:14px "Cascadia Mono", Consolas, monospace; }
-.snip { border:1px solid var(--line); border-radius:10px; margin:10px 0; background:var(--code); }
-.snip .bar { display:flex; align-items:center; gap:8px; padding:6px 10px; border-bottom:1px solid var(--line); }
-.snip .bar b { flex:1; font-size:14px; }
-.snip pre { margin:0; padding:10px 12px; white-space:pre-wrap; word-break:break-word; font:13.5px/1.5 "Cascadia Mono", Consolas, monospace; max-height:280px; overflow:auto; }
-button.copy { border:0; border-radius:8px; padding:6px 14px; font:600 14px "Segoe UI", sans-serif; cursor:pointer; background:var(--btn); color:var(--btn-ink); }
-button.copy.ok { background:var(--ok); color:#fff; }
-.note { border-left:4px solid var(--accent); background:var(--accent-soft); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
-.warn { border-left:4px solid #c2410c; background:var(--code); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
-.expect { border-left:4px solid var(--ok); background:var(--code); padding:10px 14px; border-radius:0 10px 10px 0; margin:12px 0; }
-.done-row { display:flex; align-items:center; gap:10px; margin-top:16px; padding-top:12px; border-top:1px dashed var(--line); font-weight:600; }
-.done-row input { width:20px; height:20px; accent-color:var(--ok); }
-.downloads { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:10px 0; }
-.downloads a { display:block; text-decoration:none; border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--code); }
-.downloads a b { display:block; } .downloads a span { color:var(--muted); font-size:13px; }
-footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16px 40px; }
-@media (max-width:600px) { section { padding:18px 16px; } }
+:root {
+  --navy: #2A3B4E; --navy-deep: #17212d; --orange: #F26F21; --amber: #FFB547; --teal: #2bb3a3;
+  --bg: #f6f3ee; --card: #ffffff; --ink: #1d2733; --muted: #5d6877; --line: #e4dfd6;
+  --code-bg: #f3efe8; --soft: #fff4ea; --ok: #1f8a5b; --shadow: 0 10px 30px rgba(23,33,45,.08);
+  --radius: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#10161e; --card:#18212c; --ink:#edf1f5; --muted:#a8b3c0; --line:#2a3644; --code-bg:#1f2a37; --soft:#2a2118; --ok:#4fd197; --shadow: 0 10px 30px rgba(0,0,0,.35); }
+}
+:root[data-theme="dark"] { --bg:#10161e; --card:#18212c; --ink:#edf1f5; --muted:#a8b3c0; --line:#2a3644; --code-bg:#1f2a37; --soft:#2a2118; --ok:#4fd197; --shadow: 0 10px 30px rgba(0,0,0,.35); }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16.5px/1.65 Inter, "Segoe UI", system-ui, sans-serif; overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+  background-image: radial-gradient(var(--line) 1px, transparent 1px); background-size: 26px 26px; }
+h1, h2, h3, .display { font-family: "Plus Jakarta Sans", Inter, sans-serif; letter-spacing: -.01em; }
+a { color: var(--orange); }
+code, pre, .mono { font-family: "JetBrains Mono", Consolas, monospace; }
+code { background: var(--code-bg); border-radius: 6px; padding: 1px 6px; font-size: .88em; word-break: break-word; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; position: relative; z-index: 1; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; overflow: hidden; color: #fff; background: var(--navy-deep); padding: 26px 0 90px; isolation: isolate; }
+.hero .blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .65; z-index: -1; animation: drift 18s ease-in-out infinite alternate; }
+.hero .b1 { width: 520px; height: 520px; background: var(--orange); top: -180px; right: -120px; }
+.hero .b2 { width: 460px; height: 460px; background: #3b5f86; bottom: -220px; left: -140px; animation-duration: 22s; }
+.hero .b3 { width: 280px; height: 280px; background: var(--amber); top: 40%; left: 45%; opacity: .35; animation-duration: 26s; }
+@keyframes drift { 0% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,30px) scale(1.08); } 100% { transform: translate(-30px,50px) scale(.95); } }
+.hero .grid { position: absolute; inset: 0; z-index: -1; opacity: .18;
+  background-image: linear-gradient(rgba(255,255,255,.35) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.35) 1px, transparent 1px);
+  background-size: 48px 48px; mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at 60% 40%, #000 30%, transparent 75%); }
+.topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; font-weight: 600; }
+.brand img { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--orange), var(--amber)); }
+.theme-btn { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+.hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 36px; align-items: center; margin-top: 46px; }
+.kicker { display: inline-flex; gap: 8px; align-items: center; font-size: 13.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); padding: 6px 12px; border-radius: 999px; }
+.kicker .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 0 rgba(242,111,33,.7); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(242,111,33,.7); } 70% { box-shadow: 0 0 0 12px rgba(242,111,33,0); } 100% { box-shadow: 0 0 0 0 rgba(242,111,33,0); } }
+.hero h1 { font-size: clamp(36px, 6vw, 64px); line-height: 1.03; margin: 18px 0 14px; font-weight: 800; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--orange), var(--amber), var(--orange)); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent; animation: shine 6s linear infinite; }
+@keyframes shine { to { background-position: 200% center; } }
+.typer { font-size: clamp(18px, 2.4vw, 22px); color: #d7dee7; min-height: 2.6em; }
+.typer b { color: #fff; border-right: 3px solid var(--orange); padding-right: 3px; animation: caret 1s step-end infinite; }
+@keyframes caret { 50% { border-color: transparent; } }
+.cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 12px 20px; font-weight: 600; text-decoration: none; cursor: pointer; border: 0; font: inherit; transition: transform .15s, box-shadow .15s; }
+.btn:hover { transform: translateY(-2px); }
+.btn.primary { background: var(--orange); color: #fff; box-shadow: 0 8px 24px rgba(242,111,33,.45); }
+.btn.ghost { background: rgba(255,255,255,.1); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+.stats { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+.stat { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16); border-radius: 14px; padding: 10px 14px; min-width: 120px; }
+.stat b { display: block; font-family: "Plus Jakarta Sans"; font-size: 24px; color: #fff; }
+.stat span { font-size: 13px; color: #c3ccd7; }
+/* Floating cards around the author */
+.orbit { position: relative; height: 400px; }
+.portrait { position: absolute; left: 50%; top: 50%; width: 230px; height: 230px; transform: translate(-50%,-50%); border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--orange), var(--amber), #3b5f86, var(--orange)); padding: 6px; animation: spin 12s linear infinite; }
+.portrait .inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 35%, #3b5f86, var(--navy) 70%); animation: spin 12s linear infinite reverse; }
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+.portrait .inner { transform: none; }
+@keyframes spin-inner { to { transform: rotate(-360deg); } }
+.portrait .inner { animation: spin-inner 12s linear infinite; }
+.chip { position: absolute; background: rgba(255,255,255,.95); color: var(--navy-deep); border-radius: 14px; padding: 8px 12px; font-size: 13.5px; font-weight: 600;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); display: flex; gap: 8px; align-items: center; animation: float 6s ease-in-out infinite; white-space: nowrap; }
+.chip i { font-style: normal; font-size: 18px; }
+.chip.c1 { top: 10px; left: -10px; } .chip.c2 { top: 64px; right: -24px; animation-delay: -2s; } .chip.c3 { bottom: 64px; left: -34px; animation-delay: -4s; } .chip.c4 { bottom: 4px; right: -4px; animation-delay: -1s; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.hero .wave { position: absolute; bottom: -1px; left: 0; width: 100%; height: 70px; }
+
+/* ---------- Sticky progress bar ---------- */
+.bar { position: sticky; top: 0; z-index: 30; background: color-mix(in srgb, var(--card) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.bar .scroll { position: absolute; left: 0; top: 0; height: 3px; width: 0; background: linear-gradient(90deg, var(--orange), var(--amber)); }
+.bar .wrap { display: flex; align-items: center; gap: 12px; padding-top: 9px; padding-bottom: 9px; }
+.toc { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin; flex: 1; }
+.toc a { white-space: nowrap; text-decoration: none; color: var(--ink); font-size: 14px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; background: var(--card); transition: all .2s; }
+.toc a:hover, .toc a.active { border-color: var(--orange); color: var(--orange); }
+.toc a.done { background: var(--ok); border-color: var(--ok); color: #fff; }
+.toc a.done::before { content: "✓ "; }
+.ring { --p: 0; width: 44px; height: 44px; border-radius: 50%; flex: none; display: grid; place-items: center; font-size: 11.5px; font-weight: 700;
+  background: radial-gradient(var(--card) 58%, transparent 60%), conic-gradient(var(--orange) calc(var(--p) * 1%), var(--line) 0); transition: --p .6s; }
+
+/* ---------- Sections ---------- */
+main { position: relative; z-index: 1; padding: 30px 0 40px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px 28px; margin: 22px 0; box-shadow: var(--shadow); scroll-margin-top: 74px; }
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s ease, transform .7s ease; }
+.reveal.in { opacity: 1; transform: none; }
+.card h2 { font-size: clamp(24px, 3vw, 30px); margin: 0 0 6px; display: flex; align-items: center; gap: 12px; }
+.num { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; flex: none; color: #fff; font-size: 20px;
+  background: linear-gradient(135deg, var(--orange), var(--amber)); box-shadow: 0 6px 16px rgba(242,111,33,.35); }
+.time { color: var(--muted); margin: 0 0 14px; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+.lead { font-size: 18px; color: var(--muted); max-width: 760px; }
+h3 { font-size: 19px; margin: 22px 0 8px; }
+ol.steps { padding-left: 0; list-style: none; counter-reset: s; margin: 10px 0; }
+ol.steps > li { counter-increment: s; position: relative; padding: 6px 0 6px 44px; }
+ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 6px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--soft); color: var(--orange); font-weight: 700; font-size: 14px; border: 1px solid color-mix(in srgb, var(--orange) 35%, transparent); }
+ol.steps[start="3"] { counter-reset: s 2; }
+ul.plain { padding-left: 20px; }
+ul.plain li { margin: 6px 0; }
+.callout { border-radius: 14px; padding: 14px 16px 14px 52px; margin: 14px 0; position: relative; border: 1px solid; }
+.callout::before { position: absolute; left: 16px; top: 13px; font-size: 20px; }
+.callout.note { background: color-mix(in srgb, #3b82f6 8%, var(--card)); border-color: color-mix(in srgb, #3b82f6 30%, transparent); }
+.callout.note::before { content: "💡"; }
+.callout.warn { background: color-mix(in srgb, var(--orange) 9%, var(--card)); border-color: color-mix(in srgb, var(--orange) 40%, transparent); }
+.callout.warn::before { content: "⚠️"; }
+.callout.expect { background: color-mix(in srgb, var(--ok) 9%, var(--card)); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+.callout.expect::before { content: "✅"; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 10px 0; display: block; overflow-x: auto; }
+th, td { border-bottom: 1px solid var(--line); padding: 9px 10px; text-align: left; vertical-align: top; }
+td:first-child code { white-space: nowrap; word-break: normal; }
+th { color: var(--muted); font-weight: 600; font-size: 13.5px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* Story */
+.story { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 18px 0 8px; position: relative; }
+.story { padding-bottom: 14px; }
+.story::before { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--line); border-radius: 4px; }
+.story .runner { position: absolute; bottom: 0; left: 0; width: 80px; height: 4px; border-radius: 4px; background: linear-gradient(90deg, var(--orange), var(--amber)); box-shadow: 0 0 12px rgba(242,111,33,.6); transition: left 0.9s cubic-bezier(.6,0,.2,1); z-index: 2; }
+.moment { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; text-align: center; position: relative; transition: transform .3s, border-color .3s, box-shadow .3s; cursor: pointer; }
+.moment .ico { width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 8px; display: grid; place-items: center; font-size: 22px; background: var(--soft); position: relative; z-index: 1; }
+.moment b { display: block; font-family: "Plus Jakarta Sans"; }
+.moment span { font-size: 14px; color: var(--muted); }
+.moment.on { border-color: var(--orange); transform: translateY(-6px); box-shadow: 0 14px 30px rgba(242,111,33,.18); }
+.story-ctrl { display: flex; gap: 10px; align-items: center; margin-top: 6px; color: var(--muted); font-size: 14px; }
+.mini { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; font-size: 14px; }
+.mini:hover { border-color: var(--orange); color: var(--orange); }
+.figure { background: #fff; border-radius: 16px; padding: 14px; border: 1px solid var(--line); margin: 14px 0; cursor: zoom-in; transition: transform .25s; }
+.figure:hover { transform: scale(1.01); }
+.figure img { width: 100%; height: auto; display: block; }
+.figcap { font-size: 14px; color: var(--muted); margin-top: -6px; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.duo .pane { border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; background: color-mix(in srgb, var(--soft) 55%, var(--card)); }
+.duo .pane h3 { margin-top: 0; }
+
+/* Downloads */
+.downloads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 14px 0; }
+.downloads a { display: block; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; transition: transform .2s, border-color .2s, box-shadow .2s; position: relative; overflow: hidden; }
+.downloads a::after { content: "↓"; position: absolute; right: 14px; top: 12px; font-weight: 700; color: var(--orange); transition: transform .3s; }
+.downloads a:hover { transform: translateY(-4px); border-color: var(--orange); box-shadow: var(--shadow); }
+.downloads a:hover::after { transform: translateY(4px); }
+.downloads b { display: block; font-family: "Plus Jakarta Sans"; margin-bottom: 4px; padding-right: 20px; }
+.downloads span { font-size: 14px; color: var(--muted); }
+.downloads .big { font-size: 26px; display: block; margin-bottom: 6px; }
+
+/* Snippets */
+.snip { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin: 12px 0; background: var(--code-bg); }
+.snip .head { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px 8px 14px; font-size: 13.5px; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--line); }
+.snip .dots { display: inline-flex; gap: 5px; margin-right: 10px; } .snip .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: inline-block; }
+.snip .dots i:nth-child(1) { background: #ff6b5f; } .snip .dots i:nth-child(2) { background: #ffbd2e; } .snip .dots i:nth-child(3) { background: #28c840; }
+.snip pre { margin: 0; padding: 14px; white-space: pre-wrap; word-break: break-word; font-size: 13.5px; line-height: 1.6; max-height: 320px; overflow: auto; }
+.copy { border: 0; background: var(--orange); color: #fff; border-radius: 999px; padding: 5px 14px; font: 600 13px Inter, sans-serif; cursor: pointer; transition: transform .15s, background .2s; }
+.copy:hover { transform: scale(1.05); }
+.copy.ok { background: var(--ok); }
+
+/* Done toggle */
+.done-row { margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--line); }
+.done-row label { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 600; user-select: none; }
+.done-row input { position: absolute; opacity: 0; pointer-events: none; }
+.switch { width: 52px; height: 30px; border-radius: 999px; background: var(--line); position: relative; transition: background .25s; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .3s cubic-bezier(.5,1.6,.4,1); }
+.done-row input:checked + .switch { background: var(--ok); }
+.done-row input:checked + .switch::after { transform: translateX(22px); }
+.done-row input:focus-visible + .switch { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+/* Personaliser */
+.perso { border: 2px dashed color-mix(in srgb, var(--orange) 45%, transparent); border-radius: 18px; padding: 18px; margin: 16px 0; background: color-mix(in srgb, var(--soft) 50%, var(--card)); }
+.perso h3 { margin-top: 0; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 12px 0; }
+.field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+.field label code { font-size: 12px; }
+.field input { width: 100%; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 10px; padding: 9px 11px; font: 14px "JetBrains Mono", monospace; transition: border-color .2s, box-shadow .2s; }
+.field input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(242,111,33,.2); }
+.field.good input { border-color: var(--ok); }
+.field.bad input { border-color: #d64545; }
+.field small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.field.bad small { color: #d64545; }
+.perso .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.perso .privacy { font-size: 13px; color: var(--muted); }
+
+/* Quiz */
+.quiz { border-radius: 18px; padding: 18px; margin: 16px 0; background: linear-gradient(135deg, var(--navy), #3b5f86); color: #fff; position: relative; overflow: hidden; }
+.quiz::after { content: "?"; position: absolute; right: 18px; top: -24px; font: 800 140px "Plus Jakarta Sans"; opacity: .08; }
+.quiz h3 { margin: 0 0 6px; color: #fff; }
+.quiz .opts { display: grid; gap: 8px; margin: 12px 0 4px; }
+.quiz button.opt { text-align: left; border: 1px solid rgba(255,255,255,.3); background: rgba(255,255,255,.08); color: #fff; border-radius: 12px; padding: 11px 14px; font: inherit; cursor: pointer; transition: background .2s, transform .15s; }
+.quiz button.opt:hover { background: rgba(255,255,255,.16); transform: translateX(4px); }
+.quiz button.opt.right { background: var(--ok); border-color: var(--ok); }
+.quiz button.opt.wrong { background: #b23b3b; border-color: #b23b3b; animation: shake .4s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.quiz .answer { max-height: 0; overflow: hidden; transition: max-height .6s ease; }
+.quiz .answer.open { max-height: 420px; }
+.quiz .answer p { margin: 12px 0 0; background: rgba(0,0,0,.18); border-radius: 12px; padding: 12px 14px; }
+
+/* Checklist */
+.checks { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin: 14px 0; counter-reset: c; }
+.checks div { counter-increment: c; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 14px; position: relative; font-size: 15px; transition: transform .25s; }
+.checks div:hover { transform: translateY(-4px) rotate(-1deg); border-color: var(--orange); }
+.checks div::before { content: counter(c); display: block; font: 800 34px "Plus Jakarta Sans"; color: var(--orange); line-height: 1; margin-bottom: 6px; }
+
+/* Author */
+.author { display: grid; grid-template-columns: 220px 1fr; gap: 28px; align-items: center; background: linear-gradient(135deg, var(--navy-deep), var(--navy)); color: #fff; border: 0; position: relative; overflow: hidden; }
+.author::before { content: ""; position: absolute; width: 380px; height: 380px; border-radius: 50%; background: var(--orange); filter: blur(90px); opacity: .35; right: -120px; top: -160px; }
+.author .pic { width: 200px; height: 200px; border-radius: 28px; overflow: hidden; background: radial-gradient(circle at 50% 30%, #4a6a90, var(--navy)); border: 4px solid rgba(255,255,255,.15); transform: rotate(-3deg); transition: transform .4s; position: relative; }
+.author .pic:hover { transform: rotate(2deg) scale(1.03); }
+.author .pic img { width: 100%; height: 100%; object-fit: cover; }
+.author h2 { color: #fff; margin: 0; }
+.author .role { color: var(--amber); font-weight: 600; margin: 4px 0 12px; }
+.author p { color: #dbe2ea; margin: 8px 0; }
+.author .links { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.author .links a { color: #fff; text-decoration: none; border: 1px solid rgba(255,255,255,.3); border-radius: 999px; padding: 7px 14px; font-size: 14.5px; transition: background .2s, transform .15s; }
+.author .links a:hover { background: rgba(255,255,255,.12); transform: translateY(-2px); }
+.author .badge { height: 52px; margin-top: 16px; display: block; background: #fff; padding: 8px 12px; border-radius: 12px; box-sizing: content-box; }
+.feedback { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.feedback .em { font-size: 40px; display: inline-block; animation: float 4s ease-in-out infinite; }
+
+footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px 16px 50px; position: relative; z-index: 1; }
+
+/* Lightbox, toast, confetti */
+.lightbox { position: fixed; inset: 0; background: rgba(10,14,20,.85); z-index: 60; display: none; place-items: center; padding: 20px; cursor: zoom-out; }
+.lightbox.open { display: grid; animation: fade .25s; }
+.lightbox img { max-width: 100%; max-height: 92vh; background: #fff; border-radius: 14px; padding: 10px; }
+@keyframes fade { from { opacity: 0; } }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 120px); opacity: 0; visibility: hidden; background: var(--navy-deep); color: #fff; border-radius: 999px; padding: 12px 20px; font-weight: 600; z-index: 70; transition: transform .45s cubic-bezier(.5,1.6,.4,1), opacity .3s, visibility .3s; box-shadow: 0 10px 30px rgba(0,0,0,.3); max-width: calc(100% - 32px); text-align: center; }
+.toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
+#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 80; }
+
+@media (max-width: 860px) {
+  .hero-grid { grid-template-columns: 1fr; margin-top: 28px; }
+  .orbit { display: none; }
+  .story { grid-template-columns: 1fr 1fr; } .story::before, .story .runner { display: none; }
+  .duo, .fields { grid-template-columns: 1fr; }
+  .downloads { grid-template-columns: 1fr; }
+  .checks { grid-template-columns: 1fr 1fr; }
+  .author { grid-template-columns: 1fr; text-align: left; }
+  .card { padding: 20px 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+  html { scroll-behavior: auto; }
+}
+@media print { .hero .blob, .bar, #confetti, .orbit { display: none; } .reveal { opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
-<header class="hero"><div class="wrap">
-  <div class="kicker">Lab · aMP Day Lyon 2026</div>
-  <h1>Construisons un agent ensemble</h1>
-  <p>Refaites chez vous la démonstration de la session : un workflow Copilot Studio d'accueil des nouveaux collaborateurs, écrit par GitHub Copilot et créé avec Azure CLI, puis un agent d'accueil dans Copilot Studio qui répond à partir de vos documents.</p>
-  <div class="meta"><span class="pill">Durée : 60 à 90 minutes</span><span class="pill">Niveau : introduction</span><span class="pill">Entreprise fictive : Contoso</span></div>
-</div></header>
 
-<nav class="toc"><div class="wrap" id="toc"></div></nav>
+<header class="hero">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="grid"></div>
+  <div class="wrap">
+    <div class="topline">
+      <a class="brand" href="https://e-margot.ch" target="_blank" rel="noopener"><img src="images/elliot-margot.webp" alt="">Elliot Margot</a>
+      <button class="theme-btn" id="theme" type="button" aria-label="Changer de thème">🌓 Thème</button>
+    </div>
+    <div class="hero-grid">
+      <div>
+        <span class="kicker"><span class="dot"></span>Lab · aMP Day Lyon 2026</span>
+        <h1>Construisons un <span class="grad">agent</span> ensemble</h1>
+        <div class="typer" aria-live="polite">Refaites chez vous la démo de la session : <b id="typer">un workflow écrit par GitHub Copilot</b></div>
+        <div class="cta">
+          <a class="btn primary" href="#apercu">Commencer le lab →</a>
+          <a class="btn ghost" href="#prerequis">Télécharger les fichiers</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><b data-count="90">0</b><span>minutes au plus</span></div>
+          <div class="stat"><b data-count="5">0</b><span>étapes guidées</span></div>
+          <div class="stat"><b data-count="0">0</b><span>ligne de code à la main</span></div>
+        </div>
+      </div>
+      <div class="orbit" aria-hidden="true">
+        <div class="portrait"><div class="inner"><img src="images/elliot-margot.webp" alt=""></div></div>
+        <div class="chip c1"><i>🤖</i>GitHub Copilot</div>
+        <div class="chip c2"><i>⚡</i>Workflow Copilot Studio</div>
+        <div class="chip c3"><i>📚</i>Agent qui cite ses sources</div>
+        <div class="chip c4"><i>💬</i>Publié dans Teams</div>
+      </div>
+    </div>
+  </div>
+  <svg class="wave" viewBox="0 0 1440 70" preserveAspectRatio="none" aria-hidden="true"><path d="M0,40 C240,80 480,0 720,30 C960,60 1200,10 1440,40 L1440,70 L0,70 Z" fill="var(--bg)"/></svg>
+</header>
+
+<nav class="bar" aria-label="Étapes du lab">
+  <div class="scroll" id="scrollbar"></div>
+  <div class="wrap">
+    <div class="toc" id="toc"></div>
+    <div class="ring" id="ring" title="Progression du lab">0 %</div>
+  </div>
+</nav>
 
 <main class="wrap">
 
-<section id="apercu">
+<section id="apercu" class="card reveal">
   <h2>Ce que vous allez construire</h2>
-  <p class="time">Camille arrive lundi chez Contoso. Deux choses vont l'accueillir.</p>
-  <div class="figure"><img src="images/ce-quon-va-construire.png" alt="Le workflow : bienvenue, manager prévenu, café d'accueil, vérification du matériel trois jours après. L'agent : Camille pose une question, l'assistant cherche dans les documents et répond avec sa source."></div>
-  <h3>Et comment</h3>
-  <div class="figure"><img src="images/comment-on-va-le-construire.png" alt="Le workflow : un fichier de contexte, GitHub Copilot écrit le workflow, Azure CLI l'enregistre dans Dataverse, il est actif dans Copilot Studio. L'agent : instructions, connaissances, test et évaluation, publication."></div>
+  <p class="lead">Camille arrive lundi chez Contoso, une entreprise fictive. Deux choses vont l'accueillir : un workflow qui s'occupe de tout dès que son arrivée est saisie, et un agent qui répond à ses questions.</p>
+  <h3>Le parcours de Camille</h3>
+  <div class="story" id="story">
+    <div class="runner" id="runner"></div>
+    <div class="moment" data-i="0"><div class="ico">✉️</div><b>Bienvenue</b><span>Un e-mail avec le programme de sa première semaine</span></div>
+    <div class="moment" data-i="1"><div class="ico">👋</div><b>Manager prévenu</b><span>Un message Teams avec le poste et la date</span></div>
+    <div class="moment" data-i="2"><div class="ico">☕</div><b>Café d'accueil</b><span>Lundi à 11 h avec son parrain ou sa marraine</span></div>
+    <div class="moment" data-i="3"><div class="ico">💻</div><b>3 jours après</b><span>Matériel pas remis ? Relance du manager</span></div>
+  </div>
+  <div class="story-ctrl"><button class="mini" id="replay" type="button">▶ Rejouer le parcours</button><span>Cliquez sur une étape pour la voir.</span></div>
+
+  <div class="duo" style="margin-top:22px">
+    <div class="pane"><h3>⚡ Le workflow</h3><p>Écrit par <b>GitHub Copilot</b> à partir d'une description en français, enregistré dans Dataverse avec Azure CLI, il s'ouvre ensuite dans le nouvel éditeur de Copilot Studio.</p></div>
+    <div class="pane"><h3>📚 L'agent</h3><p>Construit dans <b>Copilot Studio</b> : des instructions, les documents des ressources humaines comme seule source, un piège à déjouer, une évaluation, puis la publication dans Teams.</p></div>
+  </div>
+  <div class="figure" data-zoom><img src="images/ce-quon-va-construire.png" alt="Le workflow : bienvenue, manager prévenu, café d'accueil, vérification du matériel trois jours après. L'agent : Camille pose une question, l'assistant cherche dans les documents et répond avec sa source." loading="lazy"></div>
+  <p class="figcap">Ce que vous allez construire. Cliquez pour agrandir.</p>
+  <div class="figure" data-zoom><img src="images/comment-on-va-le-construire.png" alt="Le workflow : un fichier de contexte, GitHub Copilot écrit le workflow, Azure CLI l'enregistre dans Dataverse, il est actif dans Copilot Studio. L'agent : instructions, connaissances, test et évaluation, publication." loading="lazy"></div>
+  <p class="figcap">Et comment. Cliquez pour agrandir.</p>
 </section>
 
-<section id="prerequis">
+<section id="prerequis" class="card reveal">
   <h2>Avant de commencer</h2>
-  <div class="warn"><b>Un tenant de test, jamais de production.</b> Le lab envoie des e-mails, des messages Teams et des invitations réels, et crée un site, une liste, un workflow et un agent.</div>
+  <div class="callout warn"><b>Un tenant de test, jamais de production.</b> Le lab envoie des e-mails, des messages Teams et des invitations réels, et crée un site, une liste, un workflow et un agent.</div>
   <ul class="plain">
     <li>Un tenant Microsoft 365 de test avec SharePoint, Outlook et Teams, et un compte qui peut créer un site.</li>
     <li>Un environnement Power Platform avec Dataverse et des crédits Copilot alloués : c'est ce qui fait apparaître la nouvelle expérience de Copilot Studio (agents et workflows propulsés par le « harnais GitHub Copilot »).</li>
     <li>Azure CLI installé (la commande <code>az</code>) : <a href="https://learn.microsoft.com/cli/azure/install-azure-cli" target="_blank" rel="noopener">installer Azure CLI</a>.</li>
     <li>GitHub Copilot : l'application de bureau ou la ligne de commande, avec un abonnement actif.</li>
-    <li>Les fichiers du lab, ci-dessous.</li>
+    <li>Les fichiers du lab :</li>
   </ul>
   <div class="downloads">
-    <a href="fichiers/documents-contoso.zip" download><b>Documents Contoso (zip)</b><span>5 documents des ressources humaines + l'archive 2021 du piège</span></a>
-    <a href="fichiers/copilot-instructions.md" download><b>copilot-instructions.md</b><span>Le contexte pour GitHub Copilot (5 valeurs à remplacer)</span></a>
-    <a href="fichiers/test-set-accueil.csv" download><b>test-set-accueil.csv</b><span>Les 10 questions d'évaluation de l'agent</span></a>
+    <a href="fichiers/documents-contoso.zip" download><span class="big">🗂️</span><b>Documents Contoso (zip)</b><span>5 documents des ressources humaines et l'archive 2021 du piège</span></a>
+    <a href="fichiers/copilot-instructions.md" download><span class="big">🧭</span><b>copilot-instructions.md</b><span>Le contexte pour GitHub Copilot (5 valeurs à remplacer, ou personnalisé à l'étape 2)</span></a>
+    <a href="fichiers/test-set-accueil.csv" download><span class="big">🎯</span><b>test-set-accueil.csv</b><span>Les 10 questions d'évaluation de l'agent</span></a>
   </div>
-  <div class="done-row"><input type="checkbox" data-step="prerequis" id="c-prerequis"><label for="c-prerequis">Prêt</label></div>
+  <div class="done-row"><label><input type="checkbox" data-step="prerequis"><span class="switch"></span>Prêt à commencer</label></div>
 </section>
 
-<section id="etape1">
+<section id="etape1" class="card reveal">
   <h2><span class="num">1</span>Préparer SharePoint</h2>
-  <p class="time">Environ 15 minutes</p>
+  <p class="time">⏱️ Environ 15 minutes</p>
   <ol class="steps">
     <li>Créez un site d'équipe nommé <b>Contoso - Ressources humaines</b> (adresse conseillée : <code>/sites/contoso-rh</code>).</li>
     <li>Dans sa bibliothèque <b>Documents</b>, déposez les 5 documents du <a href="fichiers/documents-contoso.zip" download>zip</a>, et créez un dossier <b>Archives</b> où vous déposez <a href="fichiers/documents/Archives/politique-teletravail-2021.pdf" download><code>politique-teletravail-2021.pdf</code></a>. Cette vieille politique est le piège de l'étape 4 : gardez-la.</li>
     <li>Créez une liste vide nommée <b>Arrivées</b>, puis ses colonnes.</li>
   </ol>
-  <div class="note"><b>Important : créez chaque colonne d'abord avec son nom court</b> (colonne du milieu), puis renommez-la avec son nom affiché. SharePoint garde le nom court comme nom interne, et c'est lui que le workflow utilise. Une colonne créée directement en « Date d'arrivée » aurait un nom interne illisible et le workflow échouerait.</div>
+  <div class="callout note"><b>Important : créez chaque colonne d'abord avec son nom court</b> (colonne du milieu), puis renommez-la avec son nom affiché. SharePoint garde le nom court comme nom interne, et c'est lui que le workflow utilise. Une colonne créée directement en « Date d'arrivée » aurait un nom interne illisible et le workflow échouerait.</div>
   <table>
     <tr><th>Nom affiché</th><th>Nom à la création</th><th>Type</th></tr>
     <tr><td>Nom complet</td><td>(la colonne Titre existante, renommée)</td><td>Ligne de texte</td></tr>
@@ -111,15 +366,15 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
     <tr><td>Matériel remis</td><td><code>MaterielRemis</code></td><td>Choix : Non, Oui (Non par défaut)</td></tr>
   </table>
   <p>Ajoutez deux arrivées passées pour que la liste ne soit pas vide (par exemple Hugo Bernard et Inès Moreau, avec vous comme manager et parrain).</p>
-  <div class="done-row"><input type="checkbox" data-step="etape1" id="c-etape1"><label for="c-etape1">Site, documents et liste prêts</label></div>
+  <div class="done-row"><label><input type="checkbox" data-step="etape1"><span class="switch"></span>Site, documents et liste prêts</label></div>
 </section>
 
-<section id="etape2">
+<section id="etape2" class="card reveal">
   <h2><span class="num">2</span>Préparer l'environnement et relever 5 valeurs</h2>
-  <p class="time">Environ 10 minutes</p>
+  <p class="time">⏱️ Environ 10 minutes</p>
   <ol class="steps">
     <li>Dans Power Automate, environnement de test, menu <b>Connexions</b> : créez une connexion <b>SharePoint</b>, une <b>Office 365 Outlook</b> et une <b>Microsoft Teams</b>, avec votre compte. Les créer maintenant évite toute fenêtre de consentement pendant l'étape 3. GitHub Copilot créera lui-même les trois <b>références de connexion</b> Dataverse qui pointent vers elles : c'est par elles qu'un workflow Copilot Studio utilise une connexion.</li>
-    <li>Relevez les 5 valeurs, puis remplacez-les dans <a href="fichiers/copilot-instructions.md" download><code>copilot-instructions.md</code></a> (rechercher et remplacer) :</li>
+    <li>Relevez les 5 valeurs ci-dessous.</li>
   </ol>
   <table>
     <tr><th>Dans le fichier</th><th>Où la trouver</th></tr>
@@ -129,35 +384,51 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
     <tr><td><code>URL_DU_SITE</code></td><td>L'adresse du site, par exemple <code>https://votre-tenant.sharepoint.com/sites/contoso-rh</code></td></tr>
     <tr><td><code>LISTE_ID</code></td><td>Liste Arrivées, Paramètres de la liste : l'adresse contient <code>List=%7B…%7D</code>, l'ID est entre les accolades (sans <code>%7B</code> ni <code>%7D</code>)</td></tr>
   </table>
-  <div class="done-row"><input type="checkbox" data-step="etape2" id="c-etape2"><label for="c-etape2">Connexions créées, fichier complété</label></div>
+
+  <div class="perso" id="perso">
+    <h3>✨ Votre fichier de contexte, prêt à l'emploi</h3>
+    <p>Collez vos 5 valeurs : la page remplace les repères dans <code>copilot-instructions.md</code> et vous le télécharge. Plus de rechercher-remplacer à la main.</p>
+    <div class="fields">
+      <div class="field" data-k="TENANT_ID" data-type="guid"><label>Identifiant du tenant <code>TENANT_ID</code></label><input placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off" spellcheck="false"><small>Un identifiant à 36 caractères.</small></div>
+      <div class="field" data-k="ENVIRONNEMENT_ID" data-type="guid"><label>Identifiant de l'environnement <code>ENVIRONNEMENT_ID</code></label><input placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off" spellcheck="false"><small>Après <code>/environments/</code> dans l'adresse.</small></div>
+      <div class="field" data-k="URL_DATAVERSE" data-type="dv"><label>URL de l'environnement <code>URL_DATAVERSE</code></label><input placeholder="https://votre-env.crm.dynamics.com" autocomplete="off" spellcheck="false"><small>Se termine par <code>.dynamics.com</code>, sans barre oblique finale.</small></div>
+      <div class="field" data-k="URL_DU_SITE" data-type="sp"><label>Adresse du site <code>URL_DU_SITE</code></label><input placeholder="https://votre-tenant.sharepoint.com/sites/contoso-rh" autocomplete="off" spellcheck="false"><small>L'adresse du site Contoso - Ressources humaines.</small></div>
+      <div class="field" data-k="LISTE_ID" data-type="guid"><label>Identifiant de la liste <code>LISTE_ID</code></label><input placeholder="00000000-0000-0000-0000-000000000000" autocomplete="off" spellcheck="false"><small>Entre <code>%7B</code> et <code>%7D</code> dans l'adresse des paramètres.</small></div>
+    </div>
+    <div class="actions">
+      <button class="btn primary" id="gen" type="button">Télécharger mon copilot-instructions.md</button>
+      <span class="privacy">🔒 Tout reste dans votre navigateur : rien n'est envoyé nulle part.</span>
+    </div>
+  </div>
+  <div class="done-row"><label><input type="checkbox" data-step="etape2"><span class="switch"></span>Connexions créées, fichier complété</label></div>
 </section>
 
-<section id="etape3">
+<section id="etape3" class="card reveal">
   <h2><span class="num">3</span>Le workflow, écrit par GitHub Copilot</h2>
-  <p class="time">Environ 15 minutes, dont 2 minutes où Copilot travaille seul</p>
+  <p class="time">⏱️ Environ 15 minutes, dont quelques minutes où Copilot travaille seul</p>
   <ol class="steps">
     <li>Créez un dossier <b>hors de tout dépôt git</b> (par exemple <code>C:\lab-accueil</code>) et mettez-y <code>.github\</code><a href="fichiers/copilot-instructions.md" download><code>copilot-instructions.md</code></a> (le fichier complété à l'étape 2). Dans un dépôt git, l'application GitHub Copilot travaille sur une copie du dépôt où ce fichier non suivi n'existe pas.</li>
     <li>Ouvrez un terminal et connectez-vous : <code>az login --tenant VOTRE_TENANT_ID</code>.</li>
     <li>Dans GitHub Copilot, ouvrez une <b>nouvelle session</b> sur ce dossier (application : « Add local folder or repository » ; ligne de commande : <code>copilot</code> dans le dossier).</li>
     <li>Collez ce prompt et envoyez :</li>
   </ol>
-  <div data-snip="Prompt du workflow" data-label="Le prompt"></div>
-  <div class="expect"><b>Ce qui doit se passer :</b> Copilot lit le fichier de contexte, vous montre les étapes, crée les références de connexion, écrit un script dans <code>flux/</code> qui construit le workflow (la définition et le dessin de l'éditeur), l'enregistre dans Dataverse et l'active. Il vous donne le lien : le workflow s'ouvre dans le <b>nouvel éditeur</b> de Copilot Studio, page <b>Workflows</b>. Quelques minutes, sans question.</div>
-  <div class="note"><b>Pourquoi Dataverse ?</b> Un workflow Copilot Studio est une ligne de la table Dataverse <code>workflows</code>. Elle contient deux vues du même workflow : la définition exécutée et le graphe que dessine l'éditeur. Sans le graphe, le workflow tourne mais l'éditeur ne sait pas l'afficher ; le fichier de contexte donne à Copilot les règles exactes.</div>
+  <div data-snip="Prompt du workflow" data-label="Le prompt, à coller dans GitHub Copilot"></div>
+  <div class="callout expect"><b>Ce qui doit se passer :</b> Copilot lit le fichier de contexte, vous montre les étapes, crée les références de connexion, écrit un script dans <code>flux/</code> qui construit le workflow (la définition et le dessin de l'éditeur), l'enregistre dans Dataverse et l'active. Il vous donne le lien : le workflow s'ouvre dans le <b>nouvel éditeur</b> de Copilot Studio, page <b>Workflows</b>. Quelques minutes, sans question.</div>
+  <div class="callout note"><b>Pourquoi Dataverse ?</b> Un workflow Copilot Studio est une ligne de la table Dataverse <code>workflows</code>. Elle contient deux vues du même workflow : la définition exécutée et le graphe que dessine l'éditeur. Sans le graphe, le workflow tourne mais l'éditeur ne sait pas l'afficher ; le fichier de contexte donne à Copilot les règles exactes.</div>
   <h3>Tester</h3>
   <ol class="steps">
     <li>Ajoutez une ligne dans la liste : Camille Martin, un e-mail d'un compte de test, une <b>date d'arrivée passée</b> (l'attente de 3 jours est alors déjà écoulée), Matériel remis : Non.</li>
     <li>Le déclencheur passe toutes les minutes. Dites à Copilot que la ligne est ajoutée : il suit l'exécution et résume chaque action.</li>
   </ol>
-  <div class="expect"><b>Résultat :</b> l'e-mail de bienvenue, le message Teams au manager (envoyé par le Flow bot), l'invitation « Café de bienvenue », puis la relance « matériel ». Dans Copilot Studio, l'onglet <b>Activity</b> du workflow montre chaque étape en vert.</div>
-  <div class="warn"><b>Si Copilot hésite ou cherche sur le web</b> : rappelez-lui que tout est dans <code>copilot-instructions.md</code>. <b>Si une session a lu une ancienne version du fichier</b>, ouvrez-en une nouvelle : elle s'en tient à ce qu'elle a lu.</div>
+  <div class="callout expect"><b>Résultat :</b> l'e-mail de bienvenue, le message Teams au manager (envoyé par le Flow bot), l'invitation « Café de bienvenue », puis la relance « matériel ». Dans Copilot Studio, l'onglet <b>Activity</b> du workflow montre chaque étape en vert.</div>
+  <div class="callout warn"><b>Si Copilot hésite ou cherche sur le web</b> : rappelez-lui que tout est dans <code>copilot-instructions.md</code>. <b>Si une session a lu une ancienne version du fichier</b>, ouvrez-en une nouvelle : elle s'en tient à ce qu'elle a lu.</div>
   <p>Le saviez-vous ? Une exécution de workflow dure au plus 30 jours. Pour un vrai accueil, séparez-le en deux : l'accueil immédiat, et une relance quotidienne.</p>
-  <div class="done-row"><input type="checkbox" data-step="etape3" id="c-etape3"><label for="c-etape3">Workflow créé et testé</label></div>
+  <div class="done-row"><label><input type="checkbox" data-step="etape3"><span class="switch"></span>Workflow créé et testé</label></div>
 </section>
 
-<section id="etape4">
+<section id="etape4" class="card reveal">
   <h2><span class="num">4</span>L'agent d'accueil dans Copilot Studio</h2>
-  <p class="time">Environ 20 minutes</p>
+  <p class="time">⏱️ Environ 20 minutes</p>
   <ol class="steps">
     <li>Copilot Studio, environnement de test, <b>Accueil</b>, carte <b>Agent</b>. Nommez-le <b>Assistant d'accueil Contoso</b>.</li>
     <li>Collez les instructions :</li>
@@ -169,43 +440,55 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
     <li>Onglet <b>Preview</b>, posez la question :</li>
   </ol>
   <div data-snip="Question 1 (télétravail)" data-label="Question 1"></div>
-  <div class="note"><b>Le piège :</b> la réponse est juste (deux jours), mais regardez les sources : l'archive de 2021 est citée. Un document mort reste une source. Corrigez : retournez dans <b>Build</b>, cliquez juste après la dernière phrase des instructions, ajoutez la ligne ci-dessous, enregistrez, puis <b>New chat</b> et reposez la question. Seule la politique 2026 est citée. En production, la vraie correction est de sortir l'archive du site.</div>
+
+  <div class="quiz" id="quiz">
+    <h3>🕵️ Le piège : à vous de deviner</h3>
+    <p>Le site contient la politique de télétravail 2026 et, dans le dossier Archives, celle de 2021. Avant de regarder la réponse de l'agent : quelle source va-t-il citer ?</p>
+    <div class="opts">
+      <button class="opt" type="button" data-right="0">Uniquement la politique 2026, évidemment</button>
+      <button class="opt" type="button" data-right="1">La politique 2026, mais aussi l'archive de 2021</button>
+      <button class="opt" type="button" data-right="0">Aucune, il répond de mémoire</button>
+    </div>
+    <div class="answer"><p><b>Réponse : il cite aussi l'archive.</b> La réponse est juste (deux jours), mais l'archive de 2021 apparaît dans les sources. Un document mort reste une source tant qu'il est sur le site. Corrigez ci-dessous, puis reposez la question : seule la politique 2026 est citée.</p></div>
+  </div>
+
+  <div class="callout note"><b>La correction :</b> retournez dans <b>Build</b>, cliquez juste après la dernière phrase des instructions, ajoutez la ligne ci-dessous, enregistrez, puis <b>New chat</b> et reposez la question. En production, la vraie correction est de sortir l'archive du site.</div>
   <div data-snip="Ligne de correction" data-label="Ligne de correction"></div>
   <div data-snip="Question hors périmètre" data-label="Question hors périmètre (l'agent doit refuser poliment)"></div>
   <h3>Évaluer</h3>
   <ol class="steps">
     <li>Onglet <b>Evaluate</b> : nom « Accueil Contoso », <b>Import</b>, choisissez le type <b>Conversations</b> avant de déposer <a href="fichiers/test-set-accueil.csv" download><code>test-set-accueil.csv</code></a>, puis lancez.</li>
   </ol>
-  <div class="expect"><b>Résultat attendu :</b> 9 sur 10 en environ 3 minutes. L'échec est la question du salaire : la méthode « General quality » compte un refus poli comme une non-réponse. Un score se lit, il ne se croit pas sur parole.</div>
+  <div class="callout expect"><b>Résultat attendu :</b> 9 sur 10 en environ 3 minutes. L'échec est la question du salaire : la méthode « General quality » compte un refus poli comme une non-réponse. Un score se lit, il ne se croit pas sur parole.</div>
   <h3>Publier</h3>
   <ol class="steps">
     <li><b>Build</b>, <b>Channels</b>, <b>+</b>, <b>Teams + Microsoft 365</b>, « Microsoft Copilot and Microsoft Teams » (ce choix ne se change plus après publication), <b>Add channel</b>, puis <b>Publish</b>.</li>
     <li>Environ 2 minutes 30 plus tard, ouvrez l'agent dans Teams (« View in Teams + Microsoft 365 » ; si la page de lancement reste bloquée, ouvrez Teams sur le web) et posez :</li>
   </ol>
   <div data-snip="Question dans Teams" data-label="Question dans Teams"></div>
-  <div class="done-row"><input type="checkbox" data-step="etape4" id="c-etape4"><label for="c-etape4">Agent testé, évalué et publié</label></div>
+  <div class="done-row"><label><input type="checkbox" data-step="etape4"><span class="switch"></span>Agent testé, évalué et publié</label></div>
 </section>
 
-<section id="etape5">
+<section id="etape5" class="card reveal">
   <h2><span class="num">5</span>Nettoyer</h2>
-  <p class="time">5 minutes. Le harnais GitHub Copilot consomme des crédits Copilot à chaque test et évaluation.</p>
+  <p class="time">⏱️ 5 minutes. Le harnais GitHub Copilot consomme des crédits Copilot à chaque test et évaluation.</p>
   <ul class="plain">
     <li>Copilot Studio, <b>Workflows</b> : désactivez puis supprimez le workflow « Accueil des nouveaux collaborateurs ».</li>
     <li>Copilot Studio : retirez l'agent de Teams, puis supprimez-le.</li>
     <li>SharePoint : supprimez les lignes de test, ou le site entier si vous ne le gardez pas.</li>
   </ul>
-  <div class="done-row"><input type="checkbox" data-step="etape5" id="c-etape5"><label for="c-etape5">Nettoyé</label></div>
+  <div class="done-row"><label><input type="checkbox" data-step="etape5"><span class="switch"></span>Nettoyé</label></div>
 </section>
 
-<section id="retenir">
+<section id="retenir" class="card reveal">
   <h2>Avant de publier un agent : 5 vérifications</h2>
-  <ol class="steps">
-    <li>Des sources propres : une seule version de chaque politique, les archives exclues.</li>
-    <li>Des connexions créées à l'avance, avec le bon compte.</li>
-    <li>Un jeu d'évaluation d'au moins 10 questions, dont des questions hors périmètre.</li>
-    <li>Une validation humaine là où une erreur coûte cher.</li>
-    <li>Une consommation de crédits mesurée avant d'ouvrir à tout le monde.</li>
-  </ol>
+  <div class="checks">
+    <div>Des sources propres : une seule version de chaque politique, les archives exclues.</div>
+    <div>Des connexions créées à l'avance, avec le bon compte.</div>
+    <div>Un jeu d'évaluation d'au moins 10 questions, dont des questions hors périmètre.</div>
+    <div>Une validation humaine là où une erreur coûte cher.</div>
+    <div>Une consommation de crédits mesurée avant d'ouvrir à tout le monde.</div>
+  </div>
   <h3>Pour aller plus loin</h3>
   <ul class="plain">
     <li><a href="https://learn.microsoft.com/microsoft-copilot-studio/" target="_blank" rel="noopener">Documentation Copilot Studio</a></li>
@@ -214,40 +497,187 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
   </ul>
 </section>
 
+<section id="auteur" class="card author reveal">
+  <div class="pic"><img src="images/elliot-margot.webp" alt="Elliot Margot" loading="lazy"></div>
+  <div>
+    <h2>Qui a construit ce lab ?</h2>
+    <div class="role">Elliot Margot · Microsoft MVP (Most Valuable Professional) Microsoft 365 Copilot et Copilot Studio</div>
+    <p>Basé à Lausanne, Elliot construit des agents avec Copilot Studio et Microsoft 365 Copilot, et il aime les montrer en direct plutôt qu'en diapositives. Ce lab reprend sa session « Construisons un agent ensemble : Copilot Studio en direct, de zéro à un agent qui fonctionne » à l'aMP Day Lyon 2026.</p>
+    <p>Chaque semaine, il publie <b>Agentic Weekly</b>, une lettre courte sur ce qui change vraiment dans le monde des agents.</p>
+    <div class="links">
+      <a href="https://www.linkedin.com/in/elliot-margot-52742a156/" target="_blank" rel="noopener">💼 LinkedIn</a>
+      <a href="https://e-margot.ch" target="_blank" rel="noopener">🌐 e-margot.ch</a>
+      <a href="https://e-margot.ch/community/newsletter" target="_blank" rel="noopener">📰 Agentic Weekly</a>
+      <a href="https://github.com/OwnOptic" target="_blank" rel="noopener">🐙 GitHub</a>
+    </div>
+    <img class="badge" src="images/mvp-badge.png" alt="Microsoft Most Valuable Professional" loading="lazy">
+  </div>
+</section>
+
+<section id="avis" class="card reveal">
+  <div class="feedback">
+    <div><h2><span class="em">💬</span> Vous étiez dans la salle ?</h2><p class="lead" style="margin:4px 0 0">Deux minutes pour donner votre avis sur la session : ça aide vraiment.</p></div>
+    <a class="btn primary" href="https://sfeedback.com/VP5rUa" target="_blank" rel="noopener">Donner mon avis →</a>
+  </div>
+</section>
+
 </main>
-<footer>Lab de la session « Construisons un agent ensemble : Copilot Studio en direct, de zéro à un agent qui fonctionne », aMP Day Lyon 2026.<br>Par Elliot Margot, Microsoft MVP (Most Valuable Professional) Microsoft 365 Copilot et Copilot Studio. Contoso est une entreprise fictive.</footer>
+
+<footer>Lab de la session « Construisons un agent ensemble », aMP Day Lyon 2026, mardi 17 novembre, Salle 1.<br>Contoso est une entreprise fictive ; les documents du lab sont des exemples. Fait avec ☕ à Lausanne par Elliot Margot.</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-label="Image agrandie"><img alt=""></div>
+<div class="toast" id="toast" role="status"></div>
+<canvas id="confetti"></canvas>
 
 <script>
 const TEXTS = {"Prompt du workflow": "Crée le workflow Copilot Studio « Accueil des nouveaux collaborateurs » dans mon environnement de test.\nQuand une ligne est ajoutée dans la liste « Arrivées » :\n1. envoie au nouveau collaborateur (colonne E-mail) un e-mail de bienvenue chaleureux avec son programme de la première semaine ;\n2. préviens son manager dans Teams, avec le poste et la date d'arrivée ;\n3. envoie une invitation Outlook de 30 minutes « Café de bienvenue » au nouveau collaborateur et à son parrain ou sa marraine, le jour de l'arrivée à 11 h, heure de Paris ;\n4. 3 jours après la date d'arrivée, si « Matériel remis » vaut toujours Non, relance le manager par e-mail.\nMontre-moi d'abord les étapes, puis crée le workflow, active-le et donne-moi le lien pour l'ouvrir dans Copilot Studio.", "Instructions": "Tu es l'assistant d'accueil des nouveaux collaborateurs de Contoso, agence de Lyon.\n\nTu réponds en français, de façon chaleureuse et concise, aux questions sur le livret d'accueil, la première semaine, le télétravail, les congés, l'informatique et les avantages.\n\nTu réponds uniquement à partir des documents du site « Contoso - Ressources humaines » et tu cites toujours le document utilisé. Si la réponse n'y figure pas, dis-le simplement et oriente vers les ressources humaines (rh-lyon@contoso.example, poste 2100).\n\nTu ne communiques jamais d'informations personnelles ou de rémunération sur d'autres personnes.\n\nTu n'effectues aucune action à la place du collaborateur (poser des congés, commander du matériel) : tu expliques comment faire.", "Question 1 (télétravail)": "Combien de jours de télétravail ai-je droit ?", "Ligne de correction": " Ignore les documents du dossier Archives : seules les versions en vigueur comptent.", "Question 2 (période d'essai)": "Puis-je télétravailler pendant ma période d'essai ?", "Question hors périmètre": "Quel est le salaire de mon manager ?", "Question dans Teams": "Où est-ce que je récupère mon ordinateur ?"};
+const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const toastEl = document.getElementById('toast');
+let toastT;
+function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2600); }
+
+// Theme
+const themeBtn = document.getElementById('theme');
+const savedTheme = store.get('lab-accueil-theme'); if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+themeBtn.addEventListener('click', () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const next = dark ? 'light' : 'dark'; document.documentElement.dataset.theme = next; store.set('lab-accueil-theme', next);
+});
+
+// Typewriter
+const phrases = ['un workflow écrit par GitHub Copilot', 'un agent qui cite ses sources', 'un piège à déjouer ensemble', 'une évaluation sur dix questions', 'une publication dans Teams'];
+const typer = document.getElementById('typer');
+if (!reduce) {
+  let p = 0, i = phrases[0].length, del = true;
+  setTimeout(function step() {
+    const word = phrases[p];
+    if (del) { i--; if (i <= 0) { del = false; p = (p + 1) % phrases.length; } }
+    else { i++; if (i >= phrases[p].length) { del = true; typer.textContent = phrases[p]; return setTimeout(step, 1900); } }
+    typer.textContent = phrases[p].slice(0, Math.max(i, 0)) || '\u00a0';
+    setTimeout(step, del ? 28 : 55);
+  }, 2200);
+}
+
+// Counters
+const counters = document.querySelectorAll('[data-count]');
+function runCounters() { counters.forEach(el => { const end = +el.dataset.count; if (reduce || !end) { el.textContent = end; return; } let t0; const dur = 1200;
+  requestAnimationFrame(function f(t) { t0 = t0 || t; const k = Math.min((t - t0) / dur, 1); el.textContent = Math.round(end * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(f); }); }); }
+runCounters();
+
+// Snippets
 document.querySelectorAll('[data-snip]').forEach(el => {
-  const text = TEXTS[el.dataset.snip] || '';
+  const text = (TEXTS[el.dataset.snip] || '').trim();
   el.className = 'snip';
-  el.innerHTML = '<div class="bar"><b></b><button class="copy">Copier</button></div><pre></pre>';
+  el.innerHTML = '<div class="head"><span><span class="dots"><i></i><i></i><i></i></span><b></b></span><button class="copy" type="button">Copier</button></div><pre></pre>';
   el.querySelector('b').textContent = el.dataset.label;
-  el.querySelector('pre').textContent = text.trim();
+  el.querySelector('pre').textContent = text;
   el.querySelector('button').addEventListener('click', async (e) => {
     const b = e.currentTarget;
-    try { await navigator.clipboard.writeText(text.trim()); }
-    catch { const t = document.createElement('textarea'); t.value = text.trim(); document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
-    b.classList.add('ok'); b.textContent = 'Copié'; setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copier'; }, 1400);
+    try { await navigator.clipboard.writeText(text); }
+    catch { const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); }
+    b.classList.add('ok'); b.textContent = 'Copié ✓'; toast('Copié dans le presse-papiers');
+    setTimeout(() => { b.classList.remove('ok'); b.textContent = 'Copier'; }, 1500);
   });
 });
-// Table of contents with progress remembered in this browser only.
+
+// Reveal on scroll + active section
+const sections = [...document.querySelectorAll('main > section')];
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }), { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Table of contents and progress
 const toc = document.getElementById('toc');
-const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
-document.querySelectorAll('main > section').forEach(sec => {
-  const a = document.createElement('a');
-  a.href = '#' + sec.id;
-  a.textContent = sec.querySelector('h2').textContent.replace(/^\d/, m => m + '. ');
-  a.id = 'toc-' + sec.id; toc.appendChild(a);
-});
-document.querySelectorAll('input[data-step]').forEach(cb => {
+const labels = { apercu: 'Aperçu', prerequis: 'Avant de commencer', etape1: '1. SharePoint', etape2: '2. Environnement', etape3: '3. Workflow', etape4: '4. Agent', etape5: '5. Nettoyer', retenir: '5 vérifications', auteur: "L'auteur", avis: 'Votre avis' };
+sections.forEach(sec => { const a = document.createElement('a'); a.href = '#' + sec.id; a.textContent = labels[sec.id] || sec.id; a.id = 'toc-' + sec.id; toc.appendChild(a); });
+const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { toc.querySelectorAll('a').forEach(a => a.classList.remove('active')); const a = document.getElementById('toc-' + e.target.id); if (a) { a.classList.add('active'); a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduce ? 'auto' : 'smooth' }); } } }), { rootMargin: '-45% 0px -50% 0px' });
+sections.forEach(s => spy.observe(s));
+const bar = document.getElementById('scrollbar');
+addEventListener('scroll', () => { const h = document.documentElement; bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%'; }, { passive: true });
+
+const ring = document.getElementById('ring');
+const boxes = [...document.querySelectorAll('input[data-step]')];
+function progress(celebrate) {
+  const done = boxes.filter(b => b.checked).length, pct = Math.round(done / boxes.length * 100);
+  ring.style.setProperty('--p', pct); ring.textContent = pct + ' %';
+  if (celebrate && done === boxes.length) { confetti(260); toast('🎉 Bravo, le lab est terminé ! Camille est bien accueillie.'); }
+}
+boxes.forEach(cb => {
   const key = 'lab-accueil-' + cb.dataset.step;
   cb.checked = store.get(key) === '1';
   const mark = () => { const a = document.getElementById('toc-' + cb.dataset.step); if (a) a.classList.toggle('done', cb.checked); };
   mark();
-  cb.addEventListener('change', () => { store.set(key, cb.checked ? '1' : '0'); mark(); });
+  cb.addEventListener('change', () => { store.set(key, cb.checked ? '1' : '0'); mark(); if (cb.checked) { confetti(70, cb); } progress(cb.checked); });
 });
+progress(false);
+
+// Camille's journey
+const moments = [...document.querySelectorAll('.moment')];
+const runner = document.getElementById('runner');
+let storyTimer;
+function showMoment(i) {
+  moments.forEach((m, j) => m.classList.toggle('on', j === i));
+  const m = moments[i], s = document.getElementById('story');
+  runner.style.left = (m.offsetLeft + m.offsetWidth / 2 - 40) + 'px';
+}
+function playStory() { clearTimeout(storyTimer); let i = 0; (function next() { showMoment(i); i++; if (i < moments.length) storyTimer = setTimeout(next, 1300); })(); }
+moments.forEach((m, i) => m.addEventListener('click', () => { clearTimeout(storyTimer); showMoment(i); }));
+document.getElementById('replay').addEventListener('click', playStory);
+new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { reduce ? showMoment(3) : playStory(); o.disconnect(); } }), { threshold: .5 }).observe(document.getElementById('story'));
+
+// Lightbox
+const lb = document.getElementById('lightbox');
+document.querySelectorAll('[data-zoom]').forEach(f => f.addEventListener('click', () => { lb.querySelector('img').src = f.querySelector('img').src; lb.querySelector('img').alt = f.querySelector('img').alt; lb.classList.add('open'); }));
+lb.addEventListener('click', () => lb.classList.remove('open'));
+addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+// Quiz
+const quiz = document.getElementById('quiz');
+quiz.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => {
+  if (b.dataset.right === '1') { b.classList.add('right'); quiz.querySelector('.answer').classList.add('open'); confetti(90, b); }
+  else { b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); toast('Pas tout à fait… essayez encore'); }
+}));
+
+// Personalised context file
+const RX = { guid: /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, dv: /^https:\/\/[a-z0-9-]+\.crm\d*\.dynamics\.com$/i, sp: /^https:\/\/[a-z0-9-]+\.sharepoint\.com\/sites\/[^\s?#]+$/i };
+const fields = [...document.querySelectorAll('.perso .field')];
+function clean(f) { let v = f.querySelector('input').value.trim(); if (f.dataset.type !== 'guid') v = v.replace(/\/+$/, ''); else v = v.replace(/^%7B|%7D$/gi, '').replace(/^\{|\}$/g, ''); return v; }
+function check(f) { const v = clean(f); f.classList.toggle('good', !!v && RX[f.dataset.type].test(v)); f.classList.toggle('bad', !!v && !RX[f.dataset.type].test(v)); return RX[f.dataset.type].test(v); }
+fields.forEach(f => { const inp = f.querySelector('input'); const k = 'lab-accueil-val-' + f.dataset.k; inp.value = store.get(k) || ''; if (inp.value) check(f);
+  inp.addEventListener('input', () => { store.set(k, inp.value.trim()); check(f); }); });
+document.getElementById('gen').addEventListener('click', async () => {
+  const bad = fields.filter(f => !check(f));
+  if (bad.length) { bad.forEach(f => f.classList.add('bad')); bad[0].querySelector('input').focus(); toast('Une valeur ne ressemble pas au format attendu'); return; }
+  try {
+    let txt = await (await fetch('fichiers/copilot-instructions.md', { cache: 'no-store' })).text();
+    fields.forEach(f => { txt = txt.split(f.dataset.k).join(clean(f)); });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/markdown;charset=utf-8' })); a.download = 'copilot-instructions.md'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    confetti(120, document.getElementById('gen')); toast('Votre fichier est prêt : mettez-le dans .github\\');
+  } catch { toast('Téléchargement impossible : utilisez le fichier modèle et remplacez à la main'); }
+});
+
+// Confetti
+const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
+let parts = [], raf;
+function size() { cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; }
+size(); addEventListener('resize', size);
+function confetti(n, el) {
+  if (reduce) return;
+  const r = el ? el.getBoundingClientRect() : { left: innerWidth / 2, top: innerHeight / 3, width: 0, height: 0 };
+  const x0 = (r.left + r.width / 2) * devicePixelRatio, y0 = (r.top + r.height / 2) * devicePixelRatio;
+  const cols = ['#F26F21', '#FFB547', '#2A3B4E', '#2bb3a3', '#ffffff', '#3b5f86'];
+  for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, v = (4 + Math.random() * 9) * devicePixelRatio;
+    parts.push({ x: x0, y: y0, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 6 * devicePixelRatio, s: (5 + Math.random() * 6) * devicePixelRatio, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: cols[i % cols.length], life: 0 }); }
+  if (!raf) loop();
+}
+function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  parts = parts.filter(p => p.life < 140 && p.y < cv.height + 40);
+  parts.forEach(p => { p.life++; p.vy += .32 * devicePixelRatio; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.max(0, 1 - p.life / 140); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .66); cx.restore(); });
+  raf = parts.length ? requestAnimationFrame(loop) : (cx.clearRect(0, 0, cv.width, cv.height), null);
+}
 </script>
 </body>
 </html>
