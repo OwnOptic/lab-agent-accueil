@@ -96,7 +96,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
   <p class="time">Environ 15 minutes</p>
   <ol class="steps">
     <li>Créez un site d'équipe nommé <b>Contoso - Ressources humaines</b> (adresse conseillée : <code>/sites/contoso-rh</code>).</li>
-    <li>Dans sa bibliothèque <b>Documents</b>, déposez les 5 documents du zip, et créez un dossier <b>Archives</b> où vous déposez <code>politique-teletravail-2021.pdf</code>. Cette vieille politique est le piège de l'étape 4 : gardez-la.</li>
+    <li>Dans sa bibliothèque <b>Documents</b>, déposez les 5 documents du <a href="fichiers/documents-contoso.zip" download>zip</a>, et créez un dossier <b>Archives</b> où vous déposez <a href="fichiers/documents/Archives/politique-teletravail-2021.pdf" download><code>politique-teletravail-2021.pdf</code></a>. Cette vieille politique est le piège de l'étape 4 : gardez-la.</li>
     <li>Créez une liste vide nommée <b>Arrivées</b>, puis ses colonnes.</li>
   </ol>
   <div class="note"><b>Important : créez chaque colonne d'abord avec son nom court</b> (colonne du milieu), puis renommez-la avec son nom affiché. SharePoint garde le nom court comme nom interne, et c'est lui que le workflow utilise. Une colonne créée directement en « Date d'arrivée » aurait un nom interne illisible et le workflow échouerait.</div>
@@ -119,7 +119,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
   <p class="time">Environ 10 minutes</p>
   <ol class="steps">
     <li>Dans Power Automate, environnement de test, menu <b>Connexions</b> : créez une connexion <b>SharePoint</b>, une <b>Office 365 Outlook</b> et une <b>Microsoft Teams</b>, avec votre compte. Les créer maintenant évite toute fenêtre de consentement pendant l'étape 3. GitHub Copilot créera lui-même les trois <b>références de connexion</b> Dataverse qui pointent vers elles : c'est par elles qu'un workflow Copilot Studio utilise une connexion.</li>
-    <li>Relevez les 5 valeurs, puis remplacez-les dans <code>copilot-instructions.md</code> (rechercher et remplacer) :</li>
+    <li>Relevez les 5 valeurs, puis remplacez-les dans <a href="fichiers/copilot-instructions.md" download><code>copilot-instructions.md</code></a> (rechercher et remplacer) :</li>
   </ol>
   <table>
     <tr><th>Dans le fichier</th><th>Où la trouver</th></tr>
@@ -136,7 +136,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
   <h2><span class="num">3</span>Le workflow, écrit par GitHub Copilot</h2>
   <p class="time">Environ 15 minutes, dont 2 minutes où Copilot travaille seul</p>
   <ol class="steps">
-    <li>Créez un dossier <b>hors de tout dépôt git</b> (par exemple <code>C:\lab-accueil</code>) et mettez-y <code>.github\copilot-instructions.md</code>. Dans un dépôt git, l'application GitHub Copilot travaille sur une copie du dépôt où ce fichier non suivi n'existe pas.</li>
+    <li>Créez un dossier <b>hors de tout dépôt git</b> (par exemple <code>C:\lab-accueil</code>) et mettez-y <code>.github\</code><a href="fichiers/copilot-instructions.md" download><code>copilot-instructions.md</code></a> (le fichier complété à l'étape 2). Dans un dépôt git, l'application GitHub Copilot travaille sur une copie du dépôt où ce fichier non suivi n'existe pas.</li>
     <li>Ouvrez un terminal et connectez-vous : <code>az login --tenant VOTRE_TENANT_ID</code>.</li>
     <li>Dans GitHub Copilot, ouvrez une <b>nouvelle session</b> sur ce dossier (application : « Add local folder or repository » ; ligne de commande : <code>copilot</code> dans le dossier).</li>
     <li>Collez ce prompt et envoyez :</li>
@@ -174,7 +174,7 @@ footer { color:var(--muted); font-size:14px; text-align:center; padding:20px 16p
   <div data-snip="Question hors périmètre" data-label="Question hors périmètre (l'agent doit refuser poliment)"></div>
   <h3>Évaluer</h3>
   <ol class="steps">
-    <li>Onglet <b>Evaluate</b> : nom « Accueil Contoso », <b>Import</b>, choisissez le type <b>Conversations</b> avant de déposer <code>test-set-accueil.csv</code>, puis lancez.</li>
+    <li>Onglet <b>Evaluate</b> : nom « Accueil Contoso », <b>Import</b>, choisissez le type <b>Conversations</b> avant de déposer <a href="fichiers/test-set-accueil.csv" download><code>test-set-accueil.csv</code></a>, puis lancez.</li>
   </ol>
   <div class="expect"><b>Résultat attendu :</b> 9 sur 10 en environ 3 minutes. L'échec est la question du salaire : la méthode « General quality » compte un refus poli comme une non-réponse. Un score se lit, il ne se croit pas sur parole.</div>
   <h3>Publier</h3>
