@@ -271,7 +271,8 @@ table.compare { width: 100%; min-width: 640px; border-collapse: collapse; font-s
 .compare thead th.a { color: var(--orange); } .compare thead th.b { color: #1f8a7d; } .compare thead th.c { color: #6a4be0; }
 .compare tbody th { font-weight: 700; color: var(--muted); white-space: nowrap; width: 1%; }
 .compare-hint { display: none; font-size: 13px; color: var(--muted); margin: 6px 2px 0; }
-@media (max-width: 700px) { .compare-hint { display: block; } }
+@media (max-width: 700px) { .compare-hint { display: block; } table.compare { min-width: 600px; font-size: 13.5px; }
+  .compare tbody th, .compare thead th:first-child { position: sticky; left: 0; z-index: 1; white-space: normal; width: 88px; min-width: 88px; background: var(--card); box-shadow: 1px 0 0 var(--line); } }
 .pick .go { position: relative; z-index: 1; font-weight: 700; color: var(--orange); font-size: 15px; }
 .pick.on .go::after { content: " ✓ choisi"; color: var(--ok); }
 .flow4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 6px; counter-reset: f; }
