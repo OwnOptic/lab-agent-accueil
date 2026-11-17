@@ -191,6 +191,7 @@ $Articles = [ordered]@{
 foreach ($titre in $Articles.Keys) {
     Sync-Sn 'kb_knowledge' "kb_knowledge_base=$Kb^short_description=$titre" @{
         kb_knowledge_base = $Kb; short_description = $titre; text = $Articles[$titre]
+# Note : sur une instance de développeur, le flux de publication remet souvent les articles créés par l'API en brouillon. Ils restent lisibles par le compte du connecteur (rôle knowledge) ; pour les publier, ouvrez chaque article et cliquez sur Publish.
         workflow_state = 'published'; author = $U['karim.benali']; valid_to = '2100-01-01'
     } | Out-Null
 }

@@ -195,7 +195,7 @@ Les actions (nœud `connector`, `apiName` et `connectionName` = `shared_service-
 | Lire un incident | `GetRecord` | `{"tableType": "incident", "sysid": "<sys_id>", "sysparm_display_value": true}` |
 | Mettre à jour un incident | `UpdateRecord` | `{"tableType": "incident", "sysid": "<sys_id>", "body/state": "2", "body/work_notes": "..."}` |
 | Retrouver un collaborateur | `GetRecords` | `{"tableType": "sys_user", "sysparm_query": "email=<adresse>", "sysparm_fields": "sys_id,name", "sysparm_limit": 1}` |
-| Chercher dans la base de connaissances | `GetRecords` | `{"tableType": "kb_knowledge", "sysparm_query": "kb_knowledge_base.title=Contoso - Support informatique^workflow_state=published^short_descriptionLIKE<mot>^ORtextLIKE<mot>", "sysparm_fields": "number,short_description", "sysparm_limit": 3}` (n'utilise pas `GetKnowledgeArticles` : le module Knowledge API manque sur les instances de développement) |
+| Chercher dans la base de connaissances | `GetRecords` | `{"tableType": "kb_knowledge", "sysparm_query": "kb_knowledge_base.title=Contoso - Support informatique^active=true^short_descriptionLIKE<mot>^ORtextLIKE<mot>", "sysparm_fields": "number,short_description", "sysparm_limit": 3}` (n'utilise pas `GetKnowledgeArticles` : le module Knowledge API manque sur les instances de développement) |
 | Chercher dans le catalogue | `GetCatalogItems` | `{"sysparm_text": "<texte>", "sysparm_limit": 5}` |
 
 La liste renvoyée par `GetRecords` est dans `body('<action>')?['result']` : parcours-la avec une boucle « Apply to each », ou mets-la en forme avec `join` et `select`. Avec `sysparm_display_value: true`, les champs référence (`caller_id`, `assigned_to`) sont lisibles directement.
