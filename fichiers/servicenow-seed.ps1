@@ -8,7 +8,8 @@
     Crée ou met à jour, sans doublon (le script peut être relancé autant de fois que nécessaire) :
       - 8 collaborateurs fictifs (adresses @contoso.example) ;
       - 15 incidents, marqués correlation_id = contoso-seed ;
-      - la base de connaissances « Contoso - Support informatique » et ses 9 articles publiés ;
+      - la base de connaissances « Contoso - Support informatique » et ses 9 articles (souvent en brouillon
+        sur une instance de développement : ouvrez-les et cliquez Publish si vous voulez les publier) ;
       - la catégorie « Arrivées et matériel » du catalogue de services et ses 4 articles ;
       - l'utilisateur d'intégration copilot.studio (réservé aux appels d'API, sans mot de passe), que la
         connexion Power Platform utilisera. Définissez son mot de passe dans ServiceNow ensuite.
