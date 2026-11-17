@@ -263,6 +263,15 @@ body:not([data-path="sn"]):not([data-path="rs"]) [data-path]:not([data-path~="rh
 .pick.rs .tag { color: #6a4be0; background: color-mix(in srgb, #7a5af8 14%, var(--card)); }
 .pick ul { margin: 12px 0 10px; padding-left: 20px; color: var(--muted); font-size: 15px; position: relative; z-index: 1; }
 .pick ul li { margin: 3px 0; }
+.compare-wrap { margin: 18px 0 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 16px; background: color-mix(in srgb, var(--card) 94%, transparent); }
+table.compare { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14.5px; }
+.compare th, .compare td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+.compare tr:last-child th, .compare tr:last-child td { border-bottom: 0; }
+.compare thead th { font: 800 14.5px "Plus Jakarta Sans", Inter, sans-serif; }
+.compare thead th.a { color: var(--orange); } .compare thead th.b { color: #1f8a7d; } .compare thead th.c { color: #6a4be0; }
+.compare tbody th { font-weight: 700; color: var(--muted); white-space: nowrap; width: 1%; }
+.compare-hint { display: none; font-size: 13px; color: var(--muted); margin: 6px 2px 0; }
+@media (max-width: 700px) { .compare-hint { display: block; } }
 .pick .go { position: relative; z-index: 1; font-weight: 700; color: var(--orange); font-size: 15px; }
 .pick.on .go::after { content: " ✓ choisi"; color: var(--ok); }
 .flow4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 6px; counter-reset: f; }
@@ -402,6 +411,24 @@ body:not([data-path="sn"]):not([data-path="rs"]) [data-path]:not([data-path~="rh
       <span class="go">Construire l'agent de résolution →</span>
     </button>
   </div>
+
+  <h3>Les trois agents en un coup d'œil</h3>
+  <div class="compare-wrap" role="region" aria-label="Comparatif des trois agents" tabindex="0">
+    <table class="compare">
+      <thead><tr><th></th><th class="a">A. Agent d'accueil</th><th class="b">B. Agent de support informatique</th><th class="c">C. Agent de résolution</th></tr></thead>
+      <tbody>
+      <tr><th scope="row">Pour qui</th><td>Les nouveaux arrivants et leur manager</td><td>Tous les collaborateurs</td><td>L'équipe du support informatique</td></tr>
+      <tr><th scope="row">Systèmes</th><td>SharePoint, Outlook, Teams</td><td>ServiceNow, SharePoint, Teams</td><td>ServiceNow, Teams</td></tr>
+      <tr><th scope="row">Le workflow</th><td>E-mail de bienvenue, message au manager, café, relance 3 jours après l'arrivée</td><td>Ticket de préparation du poste, puis message au manager avec son numéro</td><td>Traitement des tickets simples chaque matin (tâche autonome)</td></tr>
+      <tr><th scope="row">L'agent</th><td>Répond sur les règles d'accueil, avec ses sources</td><td>Trouve la solution, crée et suit les tickets</td><td>Propose la résolution, rédige les articles qui manquent</td></tr>
+      <tr><th scope="row">Ce que vous verrez</th><td>L'e-mail, le message Teams, l'invitation, une réponse sourcée</td><td>Un ticket créé dans ServiceNow, une réponse avec l'article</td><td>Un commentaire de résolution, un brouillon d'article</td></tr>
+      <tr><th scope="row">Garde-fou</th><td>Ignore la politique de 2021 archivée</td><td>Ne demande jamais de mot de passe</td><td>Ne clôture rien, ne publie rien sans Karim</td></tr>
+      <tr><th scope="row">Préparation</th><td>Environ 15 minutes</td><td>Environ 5 minutes</td><td>Environ 5 minutes (celle de B)</td></tr>
+      <tr><th scope="row">Ce qu'on y gagne</th><td>Une première semaine sans oubli</td><td>Moins d'appels pour des demandes simples</td><td>Une documentation qui s'améliore à chaque ticket</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="compare-hint">↔ Faites glisser le tableau pour voir les trois agents.</p>
 </section>
 
 <section id="apercu" class="card reveal" data-path="rh">
