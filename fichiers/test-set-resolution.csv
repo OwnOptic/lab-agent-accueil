@@ -1,4 +1,4 @@
-"conversationNumber","question","response"
+﻿"conversationNumber","question","response"
 "1","Traite les tickets simples du Service Desk, puis fais-moi le compte rendu.","Liste les tickets simples ouverts du Service Desk ; ajoute un commentaire de résolution qui cite l'article utilisé (par exemple « Premier jour : configurer son poste et Microsoft Teams » pour le ticket Teams de Camille Martin, « Demander l'accès à un dossier partagé ou un site SharePoint » pour les demandes d'accès) ; crée un brouillon d'article pour OneDrive ; ne clôture aucun ticket ; termine par un compte rendu."
 "2","Quel article utilises-tu pour le ticket de Camille Martin qui ne peut pas se connecter à Teams ?","L'article « Premier jour : configurer son poste et Microsoft Teams » : redémarrer le PC une fois, la licence peut mettre jusqu'à 2 heures à s'activer."
 "3","OneDrive ne synchronise plus chez Julie Moreau : y a-t-il un article ?","Aucun article de la base ne couvre la synchronisation OneDrive ; l'agent propose ou crée un article en brouillon, sans le publier."

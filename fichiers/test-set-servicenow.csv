@@ -1,4 +1,4 @@
-"conversationNumber","question","response"
+﻿"conversationNumber","question","response"
 "1","Mon mot de passe a expiré, comment je fais ?","Réinitialisez-le en libre-service sur https://aka.ms/sspr, puis validez avec Microsoft Authenticator. Compte verrouillé : il se débloque après 15 minutes, ou appelez le support au poste 2200. Source : article « Réinitialiser son mot de passe Contoso »."
 "2","Mon VPN coupe tout le temps quand je suis à l'hôtel, que faire ?","Désactivez le Wi-Fi invité de l'hôtel et utilisez le partage de connexion de votre téléphone. Le VPN n'est utile que pour les applications internes : Microsoft 365 fonctionne sans. Source : article « Se connecter au VPN Contoso en déplacement »."
 "3","Je change de téléphone, comment je garde mon authentification ?","Ajoutez le nouveau téléphone dans Microsoft Authenticator depuis https://aka.ms/mysecurityinfo avant de rendre l'ancien. Téléphone perdu : appelez le support au poste 2200. Source : article « Configurer l'authentification multifacteur avec Microsoft Authenticator »."
