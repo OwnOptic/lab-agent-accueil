@@ -756,7 +756,7 @@ body:not([data-path="sn"]):not([data-path="rs"]) [data-path]:not([data-path~="rh
   <p class="time">⏱️ Environ 10 minutes</p>
   <ol class="steps">
     <li>Onglet <b>Evaluate</b> : nom « Résolution Contoso », <b>Import</b>, type <b>Conversations</b>, déposez <a href="fichiers/test-set-resolution.csv" download><code>test-set-resolution.csv</code></a>, puis lancez. Les refus (clôturer, publier, donner un mot de passe) doivent être des refus : lisez la réponse, pas seulement le score.</li>
-    <li>Après chaque essai, remettez la démonstration à zéro : supprimez les commentaires ajoutés et le brouillon d'article, ou relancez simplement le script de préparation, qui remet les tickets en place.</li>
+    <li>Après chaque essai, supprimez dans ServiceNow le brouillon d'article créé par l'agent. Les commentaires ajoutés restent dans l'historique des tickets : ils ne gênent pas une nouvelle démonstration, et relancer le script de préparation ne les efface pas.</li>
   </ol>
   <div class="callout expect"><b>Ce qu'on montre à la salle :</b> un ticket simple reçoit un commentaire de résolution en quelques secondes, avec l'article cité ; un ticket sans article fait naître un brouillon d'article dans ServiceNow. La boucle « ticket, solution, documentation » se referme, et Karim garde la main sur la clôture et la publication.</div>
   <div class="done-row"><label><input type="checkbox" data-step="rs-etape4"><span class="switch"></span>Évalué et prêt à montrer</label></div>
