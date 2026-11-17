@@ -120,6 +120,7 @@ ol.steps > li { counter-increment: s; position: relative; padding: 6px 0 6px 44p
 ol.steps > li::before { content: counter(s); position: absolute; left: 0; top: 6px; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
   background: var(--soft); color: var(--orange); font-weight: 700; font-size: 14px; border: 1px solid color-mix(in srgb, var(--orange) 35%, transparent); }
 ol.steps[start="3"] { counter-reset: s 2; }
+ol.steps[start="5"] { counter-reset: s 4; }
 ul.plain { padding-left: 20px; }
 ul.plain li { margin: 6px 0; }
 .callout { border-radius: 14px; padding: 14px 16px 14px 52px; margin: 14px 0; position: relative; border: 1px solid; }
@@ -240,6 +241,39 @@ th { color: var(--muted); font-weight: 600; font-size: 13.5px; text-transform: u
 footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px 16px 50px; position: relative; z-index: 1; }
 
 
+/* ---------- Two paths: HR onboarding or ServiceNow support ---------- */
+body[data-path="sn"] [data-path="rh"], body:not([data-path="sn"]) [data-path="sn"] { display: none !important; }
+.choose { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0 6px; }
+.pick { text-align: left; font: inherit; color: var(--ink); cursor: pointer; border: 2px solid var(--line); border-radius: 20px; padding: 18px 20px 16px; position: relative; overflow: hidden;
+  background: color-mix(in srgb, var(--card) 92%, transparent); transition: transform .2s, border-color .2s, box-shadow .2s; }
+.pick:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--orange) 60%, var(--line)); box-shadow: var(--shadow); }
+.pick.on { border-color: var(--orange); box-shadow: 0 14px 34px rgba(242,111,33,.22); }
+.pick::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; right: -70px; top: -80px; filter: blur(40px); opacity: .28; background: var(--orange); transition: opacity .3s; }
+.pick.sn::after { background: #2bb3a3; }
+.pick.on::after { opacity: .5; }
+.pick .top { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+.pick .ico { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; font-size: 26px; flex: none; background: var(--soft); }
+.pick.sn .ico { background: color-mix(in srgb, #2bb3a3 16%, var(--card)); }
+.pick b.t { display: block; font: 800 20px "Plus Jakarta Sans", Inter, sans-serif; line-height: 1.2; }
+.pick .tag { display: inline-block; margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--orange); background: var(--soft); border-radius: 999px; padding: 2px 10px; }
+.pick.sn .tag { color: #1f8a7d; background: color-mix(in srgb, #2bb3a3 14%, var(--card)); }
+.pick ul { margin: 12px 0 10px; padding-left: 20px; color: var(--muted); font-size: 15px; position: relative; z-index: 1; }
+.pick ul li { margin: 3px 0; }
+.pick .go { position: relative; z-index: 1; font-weight: 700; color: var(--orange); font-size: 15px; }
+.pick.on .go::after { content: " ✓ choisi"; color: var(--ok); }
+.flow4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 6px; counter-reset: f; }
+.flow4 div { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; text-align: center; transition: transform .25s, border-color .25s; }
+.flow4 div:hover { transform: translateY(-5px); border-color: #2bb3a3; }
+.flow4 .ico { width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 8px; display: grid; place-items: center; font-size: 22px; background: color-mix(in srgb, #2bb3a3 14%, var(--card)); }
+.flow4.six { grid-template-columns: repeat(3, 1fr); }
+.flow4 b { display: block; font-family: "Plus Jakarta Sans"; }
+.flow4 span { font-size: 14px; color: var(--muted); }
+@media (max-width: 860px) { .choose { grid-template-columns: 1fr; } .flow4, .flow4.six { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { table.tooltab { display: block; } .tooltab tr { display: block; border-bottom: 1px solid var(--line); padding: 10px 0; } .tooltab tr:first-child { display: none; }
+  .tooltab td { display: block; border: 0; padding: 2px 0; } .tooltab td:first-child { font-weight: 700; font-family: "Plus Jakarta Sans"; } .tooltab td:last-child { color: var(--muted); } }
+@media (max-width: 520px) { .pick { padding: 16px 16px 14px; } .pick .top { align-items: flex-start; gap: 10px; } .pick .ico { width: 40px; height: 40px; font-size: 20px; border-radius: 12px; }
+  .pick b.t { font-size: 18px; } .pick .tag { white-space: nowrap; font-size: 12px; padding: 2px 8px; } .pick.on .go::after { display: block; } }
+
 /* ---------- Animated page background ---------- */
 .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .bg .glow { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .32; animation: drift 24s ease-in-out infinite alternate; will-change: transform; }
@@ -302,8 +336,8 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
         <h1>Construisons un <span class="grad">agent</span> ensemble</h1>
         <div class="typer" aria-live="polite">Refaites chez vous la démo de la session : <b id="typer">un workflow écrit par GitHub Copilot</b></div>
         <div class="cta">
-          <a class="btn primary" href="#apercu">Commencer le lab →</a>
-          <a class="btn ghost" href="#prerequis">Télécharger les fichiers</a>
+          <a class="btn primary" href="#choix">Choisir mon agent →</a>
+          <a class="btn ghost" href="#prerequis" data-href-rh="#prerequis" data-href-sn="#sn-prerequis">Télécharger les fichiers</a>
         </div>
         <div class="stats">
           <div class="stat"><b data-count="90">0</b><span>minutes au plus</span></div>
@@ -344,7 +378,24 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
 
 <main class="wrap">
 
-<section id="apercu" class="card reveal">
+<section id="choix" class="card reveal">
+  <h2>Choisissez votre agent</h2>
+  <p class="lead">Deux agents, une même méthode. Prenez 5 minutes au début pour choisir et lancer la préparation : la page n'affiche ensuite que votre parcours. Vous pourrez changer à tout moment.</p>
+  <div class="choose" role="group" aria-label="Choisir l'agent à construire">
+    <button class="pick rh" type="button" data-pick="rh" aria-pressed="false">
+      <span class="top"><span class="ico">👋</span><span><b class="t">Agent d'accueil des ressources humaines</b><span class="tag">⏱️ Préparation : environ 15 minutes</span></span></span>
+      <ul><li>Un site SharePoint, une liste « Arrivées » et 5 documents</li><li>Un workflow d'accueil écrit par votre assistant de code</li><li>Un agent qui cite les documents, un piège à déjouer</li></ul>
+      <span class="go">Construire l'agent d'accueil →</span>
+    </button>
+    <button class="pick sn" type="button" data-pick="sn" aria-pressed="false">
+      <span class="top"><span class="ico">🛠️</span><span><b class="t">Agent de support informatique ServiceNow</b><span class="tag">⏱️ Préparation : environ 5 minutes</span></span></span>
+      <ul><li>Une instance ServiceNow gratuite, remplie par un script</li><li>Un agent qui suit, crée et explique les incidents</li><li>La base de connaissances et le catalogue comme outils</li></ul>
+      <span class="go">Construire l'agent de support →</span>
+    </button>
+  </div>
+</section>
+
+<section id="apercu" class="card reveal" data-path="rh">
   <h2>Ce que vous allez construire</h2>
   <p class="lead">Camille arrive lundi chez Contoso, une entreprise fictive. Deux choses vont l'accueillir : un workflow qui s'occupe de tout dès que son arrivée est saisie, et un agent qui répond à ses questions.</p>
   <h3>Le parcours de Camille</h3>
@@ -367,7 +418,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <p class="figcap">Et comment. Cliquez pour agrandir.</p>
 </section>
 
-<section id="prerequis" class="card reveal">
+<section id="prerequis" class="card reveal" data-path="rh">
   <h2>Avant de commencer</h2>
   <div class="callout warn"><b>Un tenant de test, jamais de production.</b> Le lab envoie des e-mails, des messages Teams et des invitations réels, et crée un site, une liste, un workflow et un agent.</div>
   <ul class="plain">
@@ -385,7 +436,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <div class="done-row"><label><input type="checkbox" data-step="prerequis"><span class="switch"></span>Prêt à commencer</label></div>
 </section>
 
-<section id="etape1" class="card reveal">
+<section id="etape1" class="card reveal" data-path="rh">
   <h2><span class="num">1</span>Préparer SharePoint</h2>
   <p class="time">⏱️ Environ 15 minutes</p>
   <ol class="steps">
@@ -408,7 +459,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <div class="done-row"><label><input type="checkbox" data-step="etape1"><span class="switch"></span>Site, documents et liste prêts</label></div>
 </section>
 
-<section id="etape2" class="card reveal">
+<section id="etape2" class="card reveal" data-path="rh">
   <h2><span class="num">2</span>Préparer l'environnement et relever 5 valeurs</h2>
   <p class="time">⏱️ Environ 10 minutes</p>
   <ol class="steps">
@@ -442,7 +493,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <div class="done-row"><label><input type="checkbox" data-step="etape2"><span class="switch"></span>Connexions créées, fichier complété</label></div>
 </section>
 
-<section id="etape3" class="card reveal">
+<section id="etape3" class="card reveal" data-path="rh">
   <h2><span class="num">3</span>Le workflow, écrit par GitHub Copilot</h2>
   <p class="time">⏱️ Environ 15 minutes, dont quelques minutes où Copilot travaille seul</p>
   <ol class="steps">
@@ -466,7 +517,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <div class="done-row"><label><input type="checkbox" data-step="etape3"><span class="switch"></span>Workflow créé et testé</label></div>
 </section>
 
-<section id="etape4" class="card reveal">
+<section id="etape4" class="card reveal" data-path="rh">
   <h2><span class="num">4</span>L'agent d'accueil dans Copilot Studio</h2>
   <p class="time">⏱️ Environ 20 minutes</p>
   <ol class="steps">
@@ -509,7 +560,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
   <div class="done-row"><label><input type="checkbox" data-step="etape4"><span class="switch"></span>Agent testé, évalué et publié</label></div>
 </section>
 
-<section id="etape5" class="card reveal">
+<section id="etape5" class="card reveal" data-path="rh">
   <h2><span class="num">5</span>Nettoyer</h2>
   <p class="time">⏱️ 5 minutes. Le harnais GitHub Copilot consomme des crédits Copilot à chaque test et évaluation.</p>
   <ul class="plain">
@@ -518,6 +569,140 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
     <li>SharePoint : supprimez les lignes de test, ou le site entier si vous ne le gardez pas.</li>
   </ul>
   <div class="done-row"><label><input type="checkbox" data-step="etape5"><span class="switch"></span>Nettoyé</label></div>
+</section>
+
+<section id="sn-apercu" class="card reveal" data-path="sn">
+  <h2>Ce que vous allez construire</h2>
+  <p class="lead">Chez Contoso, le support informatique reçoit surtout des demandes simples, toujours les mêmes : mot de passe expiré, Teams qui refuse la connexion, accès à un dossier, VPN qui coupe. Chaque appel au poste 2200 devient un ticket traité à la main. Vous allez construire l'<b>Assistant support Contoso</b> : un agent Copilot Studio, publié dans Teams, qui résout seul les demandes simples et crée un ticket propre, déjà qualifié, quand il ne peut pas.</p>
+  <div class="flow4 six">
+    <div><div class="ico">🔎</div><b>Il cherche une solution</b><span>Dans la base de connaissances, avec l'article cité</span></div>
+    <div><div class="ico">➕</div><b>Il crée un incident</b><span>Pour vous ou pour un collègue, avec l'article consulté noté dans le ticket</span></div>
+    <div><div class="ico">📋</div><b>Il suit vos tickets</b><span>Le dernier, ou un ticket par son numéro : état, groupe, priorité</span></div>
+    <div><div class="ico">💬</div><b>Il complète un ticket</b><span>Il ajoute votre commentaire à un ticket existant</span></div>
+    <div><div class="ico">🔑</div><b>Mot de passe</b><span>Il ne le demande jamais : il crée un ticket préformaté qu'un robot de réinitialisation peut traiter</span></div>
+    <div><div class="ico">🛒</div><b>Il oriente vers le catalogue</b><span>PC, casque, badge, accès SharePoint</span></div>
+  </div>
+  <div class="callout note"><b>Les indicateurs à suivre</b> : la part des demandes résolues sans ticket, le taux d'escalade (cible : moins de 30 %), la satisfaction (cible : 4 sur 5) et la pertinence des réponses.</div>
+  <div class="duo" style="margin-top:22px">
+    <div class="pane"><h3>🛠️ ServiceNow</h3><p>Une instance de développement gratuite, remplie par un script avec les données fictives de Contoso : 8 collaborateurs, 15 incidents, 9 articles de connaissance et 4 articles de catalogue, en français.</p></div>
+    <div class="pane"><h3>🤖 L'agent</h3><p>Construit dans <b>Copilot Studio</b> : des instructions, le connecteur ServiceNow comme outils, un jeu d'évaluation de 10 questions, puis la publication dans Teams.</p></div>
+  </div>
+</section>
+
+<section id="sn-prerequis" class="card reveal" data-path="sn">
+  <h2>Avant de commencer</h2>
+  <div class="callout warn"><b>Une instance de développement et un tenant de test, jamais de production.</b> Le lab crée des données, un utilisateur et une connexion. Tout est fictif.</div>
+  <ul class="plain">
+    <li>Un compte gratuit sur le programme développeur de ServiceNow (étape 1).</li>
+    <li>Un tenant Microsoft 365 de test avec Teams, et un environnement Power Platform avec Dataverse et des crédits Copilot alloués.</li>
+    <li>PowerShell 7 (la commande <code>pwsh</code>) : <a href="https://learn.microsoft.com/powershell/scripting/install/installing-powershell-on-windows" target="_blank" rel="noopener">installer PowerShell 7</a>.</li>
+    <li>Les fichiers du lab :</li>
+  </ul>
+  <div class="downloads">
+    <a href="fichiers/servicenow-seed.ps1" download><span class="big">⚙️</span><b>servicenow-seed.ps1</b><span>Remplit votre instance avec les données de Contoso, sans doublon</span></a>
+    <a href="fichiers/test-set-servicenow.csv" download><span class="big">🎯</span><b>test-set-servicenow.csv</b><span>Les 10 questions d'évaluation de l'agent de support</span></a>
+    <a href="fichiers/copilot-instructions.md" download><span class="big">🧭</span><b>Fichier de contexte</b><span>Pour l'étape facultative : il contient une section ServiceNow</span></a>
+  </div>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-prerequis"><span class="switch"></span>Prêt à commencer</label></div>
+</section>
+
+<section id="sn-etape1" class="card reveal" data-path="sn">
+  <h2><span class="num">1</span>Préparer ServiceNow</h2>
+  <p class="time">⏱️ Environ 5 minutes, plus l'attente de l'instance la première fois</p>
+  <ol class="steps">
+    <li>Ouvrez <a href="https://developer.servicenow.com" target="_blank" rel="noopener">developer.servicenow.com</a>, <b>Sign up</b> pour créer un identifiant ServiceNow (une adresse personnelle convient), puis <b>Request Instance</b> et la version la plus récente.</li>
+    <li>Quelques minutes plus tard, notez l'adresse de l'instance (par exemple <code>https://dev12345.service-now.com</code>) et le <b>mot de passe admin</b> : le portail ne l'affiche qu'une fois.</li>
+    <li>Ouvrez l'instance une fois dans le navigateur pour la réveiller, puis lancez le script dans PowerShell 7, depuis le dossier où vous l'avez téléchargé :</li>
+  </ol>
+  <div data-snip="Script ServiceNow" data-label="Dans PowerShell 7 (remplacez dev12345 et l'adresse)"></div>
+  <p>Le script demande le mot de passe admin. Il crée aussi <code>copilot.studio</code>, l'utilisateur que la connexion Power Platform utilisera : un compte réservé aux appels d'API (« Web service access only »), avec les rôles nécessaires, mais <b>sans mot de passe</b>. Avec <code>-MonEmail</code>, Camille Martin prend votre adresse de test : quand vous demanderez à l'agent « Où en sont mes demandes ? », il trouvera ses incidents.</p>
+  <ol class="steps" start="4">
+    <li>Dans l'instance, ouvrez l'utilisateur <code>copilot.studio</code> (<b>All</b>, <code>sys_user.list</code>), cliquez <b>Set Password</b>, <b>Generate</b>, copiez le mot de passe, puis <b>Save Password</b>.</li>
+    <li>Sur la fiche, <b>décochez « Password needs reset »</b> et cliquez <b>Update</b> : sinon toute connexion par API est refusée.</li>
+  </ol>
+  <div class="callout expect"><b>Résultat :</b> 8 collaborateurs, 15 incidents (nouveaux, en cours, en attente, résolus), la base de connaissances « Contoso - Support informatique » avec 9 articles, et la catégorie « Arrivées et matériel » du catalogue avec 4 articles. Environ 2 minutes.</div>
+  <div class="callout note"><b>Erreurs 500 passagères ?</b> Les instances de développement en renvoient parfois : le script réessaie tout seul. Il peut aussi être relancé sans risque : il met à jour au lieu de dupliquer.</div>
+  <div class="callout warn"><b>Une instance de développement s'endort</b> après quelques heures sans activité (réveillez-la depuis le portail), et elle est reprise après une dizaine de jours sans utilisation. Gardez le script : il remplit une nouvelle instance en 2 minutes.</div>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-etape1"><span class="switch"></span>Instance prête et remplie</label></div>
+</section>
+
+<section id="sn-etape2" class="card reveal" data-path="sn">
+  <h2><span class="num">2</span>La connexion ServiceNow dans Power Platform</h2>
+  <p class="time">⏱️ Environ 5 minutes</p>
+  <ol class="steps">
+    <li>Ouvrez <a href="https://make.powerapps.com" target="_blank" rel="noopener">make.powerapps.com</a>, choisissez votre <b>environnement de test</b> en haut à droite, puis <b>Connexions</b>, <b>Nouvelle connexion</b>, <b>ServiceNow</b>.</li>
+    <li>Type d'authentification : <b>Basic Authentication</b>. Instance : le nom de votre instance (<code>dev12345</code>). Nom d'utilisateur : <code>copilot.studio</code>. Mot de passe : celui que vous venez de générer.</li>
+    <li>Cliquez <b>Créer</b>. Si le test de connexion échoue sans raison claire, cochez <b>Skip connection test</b> et créez quand même : l'agent fera la vraie vérification à l'étape 3.</li>
+  </ol>
+  <div class="callout note"><b>Cinq pièges rencontrés en préparant ce lab</b> (le 17 novembre 2026, sur une instance de développement) :<br>
+  1. <b>ServiceNow refuse l'authentification de base pour un utilisateur qui peut aussi se connecter au site</b> (journal : « denied basic-auth API call for interactive-login user »). D'où un utilisateur dédié, coché <b>Web service access only</b> : le script le crée ainsi.<br>
+  2. <b>Un mot de passe défini depuis la fiche utilisateur</b> (« Set Password ») coche « Password needs reset » : toute connexion par API est alors refusée tant que la case reste cochée.<br>
+  3. <b>Le test de connexion peut échouer côté Microsoft</b>, avant même d'atteindre ServiceNow. Cochez « Skip connection test » : la vraie vérification, c'est le premier appel de l'agent.<br>
+  4. <b>Si une politique d'accès protège l'API Table</b> (System Web Services, API Access Policies), elle doit lister un profil d'authentification de base, sinon les connexions par mot de passe sont refusées.<br>
+  5. <b>Les autres modes de connexion</b> : Microsoft Entra ID User Login a été refusé par l'instance (erreur « KAA envelope ») ; OAuth demande que l'adresse de retour exacte de Power Platform soit enregistrée dans ServiceNow. Pour le lab, l'authentification de base est le chemin fiable.</div>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-etape2"><span class="switch"></span>Connexion créée</label></div>
+</section>
+
+<section id="sn-etape3" class="card reveal" data-path="sn">
+  <h2><span class="num">3</span>L'agent de support dans Copilot Studio</h2>
+  <p class="time">⏱️ Environ 25 minutes</p>
+  <ol class="steps">
+    <li>Copilot Studio, environnement de test, <b>Accueil</b>, carte <b>Agent</b>. Nommez-le <b>Assistant support Contoso</b>.</li>
+    <li>Collez les instructions :</li>
+  </ol>
+  <div data-snip="Instructions ServiceNow" data-label="Instructions de l'agent de support"></div>
+  <ol class="steps" start="3">
+    <li>Panneau de droite : retirez <b>Work IQ</b> et <b>Search all websites</b>. L'agent ne répondra qu'avec ServiceNow.</li>
+    <li><b>Tools</b>, <b>+ Add a tool</b>, cherchez <b>ServiceNow</b> et ajoutez ces actions avec votre connexion, en donnant à chacune la description ci-dessous (c'est elle qui dit à l'agent quand l'utiliser) :</li>
+  </ol>
+  <table class="tooltab">
+    <tr><th>Action ServiceNow</th><th>Réglages</th><th>Description de l'outil</th></tr>
+    <tr><td>List Records (articles)</td><td>Record Type : <code>kb_knowledge</code> ; Query : remplie par l'agent, sur le modèle <code>kb_knowledge_base.title=Contoso - Support informatique^workflow_state=published^short_descriptionLIKE&lt;mot&gt;^ORtextLIKE&lt;mot&gt;</code> (mettez ce modèle dans la description de l'entrée) ; Fields : <code>number,short_description,text</code> ; Limit : 3</td><td>Cherche une procédure dans la base de connaissances du support et renvoie l'article à citer.</td></tr>
+    <tr><td>List Records (moi)</td><td>Record Type : <code>sys_user</code> ; Query : formule <code>"email=" &amp; System.User.Email</code> ; Fields : <code>sys_id,name</code> ; Limit : 1</td><td>Retrouve dans ServiceNow le collaborateur qui pose la question (ou un collègue, par son adresse).</td></tr>
+    <tr><td>List Records (incidents)</td><td>Record Type : <code>incident</code> ; Query : formule <code>"caller_id.email=" &amp; System.User.Email &amp; "^active=true^ORDERBYDESCsys_created_on"</code> ; Display System References : oui ; Fields : <code>number,short_description,state,priority,assignment_group</code></td><td>Liste les tickets de l'utilisateur, le plus récent en premier, ou un ticket par son numéro.</td></tr>
+    <tr><td>Create Record</td><td>Record Type : <code>incident</code> ; champs <code>short_description</code>, <code>description</code>, <code>caller_id</code> (le sys_id trouvé), <code>category</code> remplis par l'agent ; <b>Exclude Reference Links : oui</b></td><td>Crée un incident, seulement après accord explicite. Pour un mot de passe : catégorie « Access &amp; Password », groupe Service Desk.</td></tr>
+    <tr><td>Update Record</td><td>Record Type : <code>incident</code> ; System ID : le sys_id du ticket ; champ <code>comments</code></td><td>Ajoute le commentaire de l'utilisateur à un de ses tickets.</td></tr>
+    <tr><td>Get catalog items</td><td>Search Text : rempli par l'agent ; Limit : 5</td><td>Cherche un article du catalogue de services (matériel, accès, badge).</td></tr>
+  </table>
+  <div class="callout note"><b>Deux réglages qui évitent des heures de recherche.</b> « Get Knowledge Articles » demande le module Knowledge API de ServiceNow, absent des instances de développement (« Requested URI does not represent any resource ») : cherchez dans la table <code>kb_knowledge</code> avec List Records. Et pour Create Record, réglez <b>Exclude Reference Links</b> sur oui : sinon ServiceNow renvoie <code>caller_id</code> sous forme d'objet et la lecture de la réponse échoue, alors que l'incident est bien créé.</div>
+  <div class="callout note"><b>Qui est le demandeur ?</b> La connexion agit sous <code>copilot.studio</code>. L'agent retrouve donc d'abord l'utilisateur par son adresse e-mail, puis passe son sys_id dans <code>caller_id</code> : le ticket est au nom de la bonne personne.</div>
+  <ol class="steps" start="5">
+    <li>Enregistrez, puis onglet <b>Preview</b> : posez ces trois questions.</li>
+  </ol>
+  <div data-snip="Question support 1" data-label="Question 1 (base de connaissances)"></div>
+  <div data-snip="Question support 2" data-label="Question 2 (vos incidents)"></div>
+  <div data-snip="Question support 3" data-label="Question 3 (création d'un incident)"></div>
+  <div class="callout expect"><b>Ce qui doit se passer :</b> la réponse sur le mot de passe cite l'article « Réinitialiser son mot de passe Contoso » ; la question 2 liste les incidents de Camille (si vous avez passé <code>-MonEmail</code>) ; la question 3 reformule, demande votre accord, puis donne le numéro du nouvel incident, que vous retrouvez dans ServiceNow avec Camille comme demandeuse et l'article consulté dans la description.</div>
+  <h3>Évaluer</h3>
+  <ol class="steps">
+    <li>Onglet <b>Evaluate</b> : nom « Support Contoso », <b>Import</b>, type <b>Conversations</b>, déposez <a href="fichiers/test-set-servicenow.csv" download><code>test-set-servicenow.csv</code></a>, puis lancez.</li>
+  </ol>
+  <div class="callout expect"><b>À lire avec recul :</b> les 8 questions de procédure doivent passer. Les deux refus (le salaire d'un collègue, le mot de passe d'un autre) peuvent être comptés comme des échecs par la méthode « General quality » : lisez la réponse, pas seulement le score.</div>
+  <h3>Publier</h3>
+  <ol class="steps">
+    <li><b>Channels</b>, <b>Teams + Microsoft 365</b>, <b>Add channel</b>, puis <b>Publish</b>. Quelques minutes plus tard, ouvrez l'agent dans Teams et demandez-lui où en sont vos demandes.</li>
+  </ol>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-etape3"><span class="switch"></span>Agent testé, évalué et publié</label></div>
+</section>
+
+<section id="sn-etape4" class="card reveal" data-path="sn">
+  <h2><span class="num">4</span>Facultatif : un workflow ServiceNow écrit par votre assistant de code</h2>
+  <p class="time">⏱️ Environ 15 minutes</p>
+  <p>Même méthode que le parcours d'accueil : vous décrivez le besoin en français, votre assistant de code (GitHub Copilot ou Claude Code) écrit le workflow Copilot Studio et l'enregistre dans Dataverse avec Azure CLI. Le fichier de contexte contient une section <b>ServiceNow</b> : la référence de connexion à créer, les tables et les formes exactes des actions (lister, créer, mettre à jour un incident, chercher un article). Préparez-le comme à l'étape 2 du parcours d'accueil (les 5 valeurs). L'exemple ci-dessous part de la liste SharePoint « Arrivées » du parcours d'accueil : le même déclencheur, déjà vérifié dans le nouvel éditeur.</p>
+  <div data-snip="Prompt ServiceNow" data-label="Exemple de besoin à décrire"></div>
+  <div class="callout note"><b>Pas de liste « Arrivées » ?</b> Demandez plutôt un workflow planifié (par exemple chaque matin, les incidents urgents sans responsable envoyés dans Teams). Le déclencheur planifié n'a pas été vérifié dans le nouvel éditeur : s'il s'affiche mal, le workflow s'exécute quand même ; regardez l'onglet <b>Activity</b>.</div>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-etape4"><span class="switch"></span>Workflow créé (ou étape passée)</label></div>
+</section>
+
+<section id="sn-etape5" class="card reveal" data-path="sn">
+  <h2><span class="num">5</span>Nettoyer</h2>
+  <p class="time">⏱️ 5 minutes. Chaque test et chaque évaluation consomment des crédits Copilot.</p>
+  <ul class="plain">
+    <li>Copilot Studio : retirez l'agent de Teams, puis supprimez-le. Supprimez le workflow facultatif s'il existe.</li>
+    <li>Power Platform : supprimez la connexion ServiceNow si vous ne la gardez pas.</li>
+    <li>ServiceNow : rien d'obligatoire. L'instance est reprise automatiquement après une dizaine de jours sans utilisation.</li>
+  </ul>
+  <div class="done-row"><label><input type="checkbox" data-step="sn-etape5"><span class="switch"></span>Nettoyé</label></div>
 </section>
 
 <section id="retenir" class="card reveal">
@@ -570,7 +755,7 @@ footer { text-align: center; color: var(--muted); font-size: 14px; padding: 30px
 <canvas id="confetti"></canvas>
 
 <script>
-const TEXTS = {"Prompt du workflow": "Crée le workflow Copilot Studio « Accueil des nouveaux collaborateurs » dans mon environnement de test.\nQuand une ligne est ajoutée dans la liste « Arrivées » :\n1. envoie au nouveau collaborateur (colonne E-mail) un e-mail de bienvenue chaleureux avec son programme de la première semaine ;\n2. préviens son manager dans Teams, avec le poste et la date d'arrivée ;\n3. envoie une invitation Outlook de 30 minutes « Café de bienvenue » au nouveau collaborateur et à son parrain ou sa marraine, le jour de l'arrivée à 11 h, heure de Paris ;\n4. 3 jours après la date d'arrivée, si « Matériel remis » vaut toujours Non, relance le manager par e-mail.\nMontre-moi d'abord les étapes, puis crée le workflow, active-le et donne-moi le lien pour l'ouvrir dans Copilot Studio.", "Instructions": "Tu es l'assistant d'accueil des nouveaux collaborateurs de Contoso, agence de Lyon.\n\nTu réponds en français, de façon chaleureuse et concise, aux questions sur le livret d'accueil, la première semaine, le télétravail, les congés, l'informatique et les avantages.\n\nTu réponds uniquement à partir des documents du site « Contoso - Ressources humaines » et tu cites toujours le document utilisé. Si la réponse n'y figure pas, dis-le simplement et oriente vers les ressources humaines (rh-lyon@contoso.example, poste 2100).\n\nTu ne communiques jamais d'informations personnelles ou de rémunération sur d'autres personnes.\n\nTu n'effectues aucune action à la place du collaborateur (poser des congés, commander du matériel) : tu expliques comment faire.", "Question 1 (télétravail)": "Combien de jours de télétravail ai-je droit ?", "Ligne de correction": " Ignore les documents du dossier Archives : seules les versions en vigueur comptent.", "Question 2 (période d'essai)": "Puis-je télétravailler pendant ma période d'essai ?", "Question hors périmètre": "Quel est le salaire de mon manager ?", "Question dans Teams": "Où est-ce que je récupère mon ordinateur ?"};
+const TEXTS = {"Prompt du workflow": "Crée le workflow Copilot Studio « Accueil des nouveaux collaborateurs » dans mon environnement de test.\nQuand une ligne est ajoutée dans la liste « Arrivées » :\n1. envoie au nouveau collaborateur (colonne E-mail) un e-mail de bienvenue chaleureux avec son programme de la première semaine ;\n2. préviens son manager dans Teams, avec le poste et la date d'arrivée ;\n3. envoie une invitation Outlook de 30 minutes « Café de bienvenue » au nouveau collaborateur et à son parrain ou sa marraine, le jour de l'arrivée à 11 h, heure de Paris ;\n4. 3 jours après la date d'arrivée, si « Matériel remis » vaut toujours Non, relance le manager par e-mail.\nMontre-moi d'abord les étapes, puis crée le workflow, active-le et donne-moi le lien pour l'ouvrir dans Copilot Studio.", "Instructions": "Tu es l'assistant d'accueil des nouveaux collaborateurs de Contoso, agence de Lyon.\n\nTu réponds en français, de façon chaleureuse et concise, aux questions sur le livret d'accueil, la première semaine, le télétravail, les congés, l'informatique et les avantages.\n\nTu réponds uniquement à partir des documents du site « Contoso - Ressources humaines » et tu cites toujours le document utilisé. Si la réponse n'y figure pas, dis-le simplement et oriente vers les ressources humaines (rh-lyon@contoso.example, poste 2100).\n\nTu ne communiques jamais d'informations personnelles ou de rémunération sur d'autres personnes.\n\nTu n'effectues aucune action à la place du collaborateur (poser des congés, commander du matériel) : tu expliques comment faire.", "Question 1 (télétravail)": "Combien de jours de télétravail ai-je droit ?", "Ligne de correction": " Ignore les documents du dossier Archives : seules les versions en vigueur comptent.", "Question 2 (période d'essai)": "Puis-je télétravailler pendant ma période d'essai ?", "Question hors périmètre": "Quel est le salaire de mon manager ?", "Question dans Teams": "Où est-ce que je récupère mon ordinateur ?", "Script ServiceNow": "pwsh -File .\\servicenow-seed.ps1 -Instance dev12345 -MonEmail vous@votre-tenant.onmicrosoft.com", "Instructions ServiceNow": "Tu es l'assistant du support informatique de Contoso, agence de Lyon.\n\nTu réponds en français, de façon claire et concise, aux questions informatiques des collaborateurs : mots de passe, VPN, Teams, matériel, accès, imprimantes.\n\nAvant toute action sur un ticket, retrouve le collaborateur dans ServiceNow par son adresse e-mail.\n\nPour une question pratique, cherche d'abord dans la base de connaissances et cite le titre de l'article utilisé. Si rien ne correspond, dis-le simplement et propose de créer un incident.\n\nAvant de créer un incident, reformule le problème en une phrase et demande l'accord du collaborateur. L'incident peut être pour lui ou pour un collègue (demande son adresse e-mail). Note dans la description le titre de l'article déjà consulté. Après la création, donne le numéro de l'incident.\n\nQuand un collaborateur demande où en sont ses demandes, donne son dernier ticket, ou celui dont il cite le numéro (INC...) : état, groupe, priorité. Tu peux ajouter son commentaire à un de ses tickets.\n\nTu ne demandes jamais de mot de passe et tu n'en communiques jamais. Pour un mot de passe oublié ou expiré, propose la réinitialisation en libre-service ; si elle échoue, crée un incident de catégorie « Access & Password », sans jamais écrire de mot de passe dedans.\n\nPour du matériel ou un accès (PC, casque, badge, site SharePoint), propose l'article correspondant du catalogue de services.\n\nTu ne supprimes jamais de ticket et tu ne montres que les tickets du collaborateur qui te parle. Si la question ne concerne pas l'informatique, ou si tu ne sais pas, oriente poliment vers le support au poste 2200.", "Question support 1": "Mon mot de passe a expiré, comment je fais ?", "Question support 2": "Où en sont mes demandes ?", "Question support 3": "Mon VPN coupe toutes les dix minutes depuis l'hôtel, tu peux ouvrir un incident ?", "Prompt ServiceNow": "Crée le workflow Copilot Studio « Préparer l'arrivée côté informatique » dans mon environnement de test.\nQuand une ligne est ajoutée dans la liste SharePoint « Arrivées » :\n1. crée dans ServiceNow un incident de préparation du poste, avec pour demandeur le manager du nouvel arrivant (retrouvé par son adresse e-mail), et dans la description son nom, son poste, sa date d'arrivée et le matériel à préparer ;\n2. envoie un message Teams au support informatique avec le numéro du ticket.\nMontre-moi d'abord les étapes, puis crée le workflow, active-le et donne-moi le lien pour l'ouvrir dans Copilot Studio."};
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
 const toastEl = document.getElementById('toast');
@@ -586,7 +771,7 @@ themeBtn.addEventListener('click', () => {
 });
 
 // Typewriter
-const phrases = ['un workflow écrit par GitHub Copilot', 'un agent qui cite ses sources', 'un piège à déjouer ensemble', 'une évaluation sur dix questions', 'une publication dans Teams'];
+const phrases = ['un workflow écrit par GitHub Copilot', 'un agent qui cite ses sources', 'un piège à déjouer ensemble', 'une évaluation sur dix questions', 'une publication dans Teams', 'ou un agent de support ServiceNow'];
 const typer = document.getElementById('typer');
 if (!reduce) {
   let p = 0, i = phrases[0].length, del = true;
@@ -628,19 +813,24 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 // Table of contents and progress
 const toc = document.getElementById('toc');
-const labels = { apercu: 'Aperçu', prerequis: 'Avant de commencer', etape1: '1. SharePoint', etape2: '2. Environnement', etape3: '3. Workflow', etape4: '4. Agent', etape5: '5. Nettoyer', retenir: '5 vérifications', auteur: "L'auteur", avis: 'Votre avis' };
-sections.forEach(sec => { const a = document.createElement('a'); a.href = '#' + sec.id; a.textContent = labels[sec.id] || sec.id; a.id = 'toc-' + sec.id; toc.appendChild(a); });
+const boxes = [...document.querySelectorAll('input[data-step]')];
+const labels = { choix: 'Choisir', 'sn-apercu': 'Aperçu', 'sn-prerequis': 'Avant de commencer', 'sn-etape1': '1. ServiceNow', 'sn-etape2': '2. Connexion', 'sn-etape3': '3. Agent', 'sn-etape4': '4. Workflow', 'sn-etape5': '5. Nettoyer', apercu: 'Aperçu', prerequis: 'Avant de commencer', etape1: '1. SharePoint', etape2: '2. Environnement', etape3: '3. Workflow', etape4: '4. Agent', etape5: '5. Nettoyer', retenir: '5 vérifications', auteur: "L'auteur", avis: 'Votre avis' };
+const visible = el => { const p = el.closest('[data-path]'); return !p || p.dataset.path === (document.body.dataset.path || 'rh'); };
+function buildToc() {
+  toc.textContent = '';
+  sections.filter(visible).forEach(sec => { const a = document.createElement('a'); a.href = '#' + sec.id; a.textContent = labels[sec.id] || sec.id; a.id = 'toc-' + sec.id; toc.appendChild(a); });
+  boxes.forEach(cb => { const a = document.getElementById('toc-' + cb.dataset.step); if (a) a.classList.toggle('done', cb.checked); });
+}
 const spy = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { toc.querySelectorAll('a').forEach(a => a.classList.remove('active')); const a = document.getElementById('toc-' + e.target.id); if (a) { a.classList.add('active'); a.scrollIntoView({ block: 'nearest', inline: 'center', behavior: reduce ? 'auto' : 'smooth' }); } } }), { rootMargin: '-45% 0px -50% 0px' });
 sections.forEach(s => spy.observe(s));
 const bar = document.getElementById('scrollbar');
 addEventListener('scroll', () => { const h = document.documentElement; bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%'; }, { passive: true });
 
 const ring = document.getElementById('ring');
-const boxes = [...document.querySelectorAll('input[data-step]')];
 function progress(celebrate) {
-  const done = boxes.filter(b => b.checked).length, pct = Math.round(done / boxes.length * 100);
+  const mine = boxes.filter(visible), done = mine.filter(b => b.checked).length, pct = Math.round(done / mine.length * 100);
   ring.style.setProperty('--p', pct); ring.textContent = pct + ' %';
-  if (celebrate && done === boxes.length) { confetti(260); toast('🎉 Bravo, le lab est terminé ! Camille est bien accueillie.'); }
+  if (celebrate && done === mine.length) { confetti(260); toast(document.body.dataset.path === 'sn' ? '🎉 Bravo, le lab est terminé ! Le support de Contoso a son agent.' : '🎉 Bravo, le lab est terminé ! Camille est bien accueillie.'); }
 }
 boxes.forEach(cb => {
   const key = 'lab-accueil-' + cb.dataset.step;
@@ -649,7 +839,20 @@ boxes.forEach(cb => {
   mark();
   cb.addEventListener('change', () => { store.set(key, cb.checked ? '1' : '0'); mark(); if (cb.checked) { confetti(70, cb); } progress(cb.checked); });
 });
-progress(false);
+// Choice of agent: HR onboarding (rh) or ServiceNow support (sn)
+const picks = [...document.querySelectorAll('[data-pick]')];
+function setPath(path, jump) {
+  document.body.dataset.path = path;
+  picks.forEach(b => { const on = b.dataset.pick === path; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  document.querySelectorAll('[data-href-' + path + ']').forEach(a => { a.setAttribute('href', a.getAttribute('data-href-' + path)); });
+  buildToc(); progress(false);
+  document.querySelectorAll('main > section.reveal').forEach(el => { if (visible(el)) io.observe(el); });
+  if (jump) document.getElementById(path === 'sn' ? 'sn-apercu' : 'apercu').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+}
+picks.forEach(b => b.addEventListener('click', () => { store.set('lab-path', b.dataset.pick); setPath(b.dataset.pick, true); confetti(50, b); }));
+const fromHash = location.hash.startsWith('#sn-') ? 'sn' : (/^#(apercu|prerequis|etape\d)$/.test(location.hash) ? 'rh' : null);
+setPath(fromHash || store.get('lab-path') || 'rh', false);
+if (fromHash && document.querySelector(location.hash)) setTimeout(() => document.querySelector(location.hash).scrollIntoView(), 60);
 
 // Camille's journey
 const moments = [...document.querySelectorAll('.moment')];

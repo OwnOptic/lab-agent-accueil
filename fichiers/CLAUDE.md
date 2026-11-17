@@ -180,6 +180,28 @@ Dis à l'utilisateur d'ajouter une ligne dans la liste (le déclencheur passe to
 2. `GET .../flows/<name>/runs?api-version=2016-11-01`, puis `.../runs/<runId>/actions?api-version=2016-11-01`.
 Résume le statut de chaque action. Si une action échoue, l'erreur réelle est souvent dans le lien signé `outputsLink.uri` de l'action : ouvre-le. L'onglet **Activity** de l'éditeur montre la même chose.
 
+## Variante ServiceNow (si l'utilisateur a choisi l'agent de support)
+
+L'utilisateur a une instance de développement ServiceNow préparée par `servicenow-seed.ps1`, et une connexion **ServiceNow** (authentification de base, utilisateur `copilot.studio`) dans son environnement. Crée sa référence de connexion comme les autres (même méthode que plus haut) : connecteur `shared_service-now`, référence `new_support_servicenow`, nom affiché « Support ServiceNow ». Pour un workflow qui n'utilise que ServiceNow et Teams, ne crée que les références dont il a besoin.
+
+Les données : table `incident` (champs utiles : `number`, `short_description`, `description`, `caller_id`, `priority`, `state`, `assigned_to`, `assignment_group`, `category`), incidents de démonstration marqués `correlation_id = contoso-seed` ; base de connaissances « Contoso - Support informatique » ; catégorie de catalogue « Arrivées et matériel ». États d'un incident : 1 nouveau, 2 en cours, 3 en attente, 6 résolu, 7 clos. Priorité : 1 critique à 5 planification.
+
+Les actions (nœud `connector`, `apiName` et `connectionName` = `shared_service-now`, même forme que les autres connecteurs) :
+
+| Étape | Opération | `parameters` |
+|---|---|---|
+| Lister des incidents | `GetRecords` | `{"tableType": "incident", "sysparm_query": "active=true^priority<=2^assigned_toISEMPTY", "sysparm_limit": 10, "sysparm_display_value": true, "sysparm_fields": "number,short_description,priority,state,caller_id"}` |
+| Créer un incident | `CreateRecord` | `{"tableType": "incident", "body/short_description": "...", "body/description": "...", "body/caller_id": "<sys_id du demandeur>", "body/urgency": "2", "sysparm_display_value": true, "sysparm_exclude_reference_link": true}` (le corps est dynamique : un champ ServiceNow = une clé `body/<nom du champ>`. **Garde `sysparm_exclude_reference_link: true`** : sans lui, la réponse renvoie `caller_id` sous forme d'objet et l'action échoue alors que l'incident est créé.) |
+| Lire un incident | `GetRecord` | `{"tableType": "incident", "sysid": "<sys_id>", "sysparm_display_value": true}` |
+| Mettre à jour un incident | `UpdateRecord` | `{"tableType": "incident", "sysid": "<sys_id>", "body/state": "2", "body/work_notes": "..."}` |
+| Retrouver un collaborateur | `GetRecords` | `{"tableType": "sys_user", "sysparm_query": "email=<adresse>", "sysparm_fields": "sys_id,name", "sysparm_limit": 1}` |
+| Chercher dans la base de connaissances | `GetRecords` | `{"tableType": "kb_knowledge", "sysparm_query": "kb_knowledge_base.title=Contoso - Support informatique^workflow_state=published^short_descriptionLIKE<mot>^ORtextLIKE<mot>", "sysparm_fields": "number,short_description", "sysparm_limit": 3}` (n'utilise pas `GetKnowledgeArticles` : le module Knowledge API manque sur les instances de développement) |
+| Chercher dans le catalogue | `GetCatalogItems` | `{"sysparm_text": "<texte>", "sysparm_limit": 5}` |
+
+La liste renvoyée par `GetRecords` est dans `body('<action>')?['result']` : parcours-la avec une boucle « Apply to each », ou mets-la en forme avec `join` et `select`. Avec `sysparm_display_value: true`, les champs référence (`caller_id`, `assigned_to`) sont lisibles directement.
+
+Pour un workflow qui part d'une nouvelle arrivée, garde le déclencheur SharePoint « élément créé » décrit plus haut : il est vérifié dans le nouvel éditeur. Un workflow planifié commence par un déclencheur `Recurrence` dans la définition (`{"type": "Recurrence", "recurrence": {"frequency": "Day", "interval": 1, "schedule": {"hours": ["8"]}, "timeZone": "Romance Standard Time"}}`). Le dessin de ce déclencheur dans l'éditeur n'a pas été vérifié ici : si l'éditeur l'affiche mal, le workflow tourne quand même ; dis-le à l'utilisateur plutôt que d'improviser.
+
 ## Garde-fous
 
 N'affiche jamais un jeton. Ne touche à aucun autre environnement ni à aucun autre workflow. Ne supprime rien, ne recrée pas des références de connexion qui existent déjà. Avant de modifier un workflow existant, relis son `clientdata` et garde-le dans `./sauvegardes/`.
